@@ -42,7 +42,7 @@ npm run swagger-autogen
 http://localhost:3005/swagger
 ```
 
-- 參考資料 : [使用 Swagger 自動生成 API 文件](https://israynotarray.com/nodejs/20201229/1974873838/)
+-   參考資料 : [使用 Swagger 自動生成 API 文件](https://israynotarray.com/nodejs/20201229/1974873838/)
 
 ## 資料夾說明
 
@@ -72,12 +72,12 @@ freyja
 
 ## 專案技術
 
-- node.js v20.8.9
-- tsx v3.14.0
-- esbuild v0.19.5
-- express v4.18.2
-- mongoose v7.6.3
-- jsonwebtoken v9.0.2
+-   node.js v20.8.9
+-   tsx v3.14.0
+-   esbuild v0.19.5
+-   express v4.18.2
+-   mongoose v7.6.3
+-   jsonwebtoken v9.0.2
 
 ## 專案指令列表
 
