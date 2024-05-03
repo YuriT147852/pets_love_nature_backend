@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use('/public', express.static('public'));
 app.use(Routes);
+
 app.use('/', indexRouter);
 const port = process.env.PORT || 3000;
 
