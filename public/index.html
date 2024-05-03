@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Hello, world!</title>
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+            crossorigin="anonymous"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <form action="http://localhost:3000/api/v1/user/githubLogin" method="POST">
+                <button type="submit">登入</button>
+            </form>
+
+            <button id="getUserData">取得用戶資料</button>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+            crossorigin="anonymous"
+        ></script>
+
+        <script>
+            const getUserData = document.querySelector('#getUserData');
+            const token = document.cookie
+                ?.split('; ')
+                ?.find(row => row.startsWith('token='))
+                ?.split('=')[1];
+            getUserData.addEventListener('click', () => {
+                axios
+                    .get('/user', {
+                        headers: {
+                            Authorization: token
+                        }
+                    })
+                    .then(res => {
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            });
+        </script>
+    </body>
+</html>
