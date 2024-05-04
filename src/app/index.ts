@@ -9,7 +9,7 @@ import indexRouter from './../routes/index';
 //  資料庫連線
 const { DATABASE, DATABASE_PASSWORD } = process.env;
 mongoose.set('strictQuery', false);
-
+//大頭測試
 mongoose
     .connect(DATABASE?.replace('<password>', `${DATABASE_PASSWORD}`))
     .then(() => {
