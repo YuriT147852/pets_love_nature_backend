@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import * as exception from '@/app/exception';
 
 import indexRouter from './../routes/index';
-import { isErrored } from 'nodemailer/lib/xoauth2';
+// import { isErrored } from 'nodemailer/lib/xoauth2'; 先註解測試Render部屬
 
 //  資料庫連線
 const { DATABASE, DATABASE_PASSWORD } = process.env;
