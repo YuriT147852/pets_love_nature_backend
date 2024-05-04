@@ -11,5 +11,10 @@ module.exports = {
         project: ['./tsconfig.json']
     },
     plugins: ['@typescript-eslint'],
-    root: true
+    root: true,
+    rules: {
+        '@typescript-eslint/no-misused-promises': 'off',
+        '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+        '@typescript-eslint/no-unsafe-assignment': 'off'
+    }
 };
