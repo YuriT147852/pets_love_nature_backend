@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import user from './api/v1/user';
+import { callback } from '@/controllers/user';
 import swagger from './swagger';
 
 const routes = Router();
@@ -12,5 +13,8 @@ routes.use(
     '/api/v1/user',
     user
 );
+
+// 路由處理 GitHub 回傳
+routes.use('/callback', callback);
 
 export default routes;
