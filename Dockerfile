@@ -12,10 +12,10 @@ RUN npm install
 RUN npm run build
 
 # 暴露應用程式所使用的端口
-EXPOSE 3005
+EXPOSE 3000
 
 # 設定多個環境變數
-ENV PORT=3005 \
+ENV PORT=3000 \
     NODE_ENV=production
 
 # 啟動您的應用程式
