@@ -20,6 +20,7 @@ export const githubLogin: RequestHandler = (_req, res, next) => {
 };
 
 export const getInfo: RequestHandler = (req, res) => {
+  console.log(1)
   res.send({
     status: true,
     result: req.user
