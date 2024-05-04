@@ -23,7 +23,7 @@ npm run dev
 在瀏覽器網址列輸入以下即可看到畫面
 
 ```bash
-http://localhost:3005/
+http://localhost:3000/
 ```
 
 ## Swagger
@@ -39,7 +39,7 @@ npm run swagger-autogen
 在瀏覽器網址列輸入以下即可看到畫面
 
 ```bash
-http://localhost:3005/swagger
+http://localhost:3000/swagger
 ```
 
 -   參考資料 : [使用 Swagger 自動生成 API 文件](https://israynotarray.com/nodejs/20201229/1974873838/)
