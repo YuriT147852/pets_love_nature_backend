@@ -3,11 +3,14 @@ import cors from 'cors';
 import 'dotenv/config';
 import Routes from '@/routes';
 import mongoose from 'mongoose';
+import * as exception from '@/app/exception';
 
 import indexRouter from './../routes/index';
+import { isErrored } from 'nodemailer/lib/xoauth2';
 
 //  資料庫連線
 const { DATABASE, DATABASE_PASSWORD } = process.env;
+
 mongoose.set('strictQuery', false);
 //大頭測試2
 mongoose
@@ -25,6 +28,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use('/public', express.static('public'));
 app.use(Routes);
+
+app.use(exception.sendNotFoundError);
+app.use(exception.catchCustomError);
 
 app.use('/', indexRouter);
 const port = process.env.PORT || 3000;
