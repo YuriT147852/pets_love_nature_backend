@@ -114,7 +114,3 @@ export const passportFun: RequestHandler = (req, res) => {
     const token = jwt.sign({ data }, JWT_SECRET);
     res.status(200).json({ message: 'true', token });
 };
-
-//一開始你點選login 圖案
-
-// callback url

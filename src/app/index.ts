@@ -29,13 +29,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(morgan('dev'));
-app.use('/public', express.static('public'));
+
 app.use(Routes);
 
 app.use(exception.sendNotFoundError);
 app.use(exception.catchCustomError);
-
 app.use('/', indexRouter);
+
+app.use('/public', express.static('public'));
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
