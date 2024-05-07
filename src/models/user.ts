@@ -3,6 +3,7 @@ import { Schema, model, type Document } from 'mongoose';
 export interface IUser extends Document {
     name: string;
     email: string;
+    _json?: unknown;
 }
 
 const userSchema = new Schema<IUser>(

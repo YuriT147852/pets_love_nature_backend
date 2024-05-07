@@ -44,4 +44,10 @@ router.get(
     UserController.getInfo
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+router.get('/google', UserController.passportScope);
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+router.post('/googleCallback', UserController.passportSession, UserController.passportFun);
+
 export default router;
