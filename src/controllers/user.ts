@@ -119,7 +119,7 @@ export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _ne
     //先判斷有沒有這個email
     if (resuser !== null) {
         // console.log('不需註冊,直接返回');
-        const token = jwt.sign({ data }, JWT_SECRET);
+        const token = jwt.sign({ name, email }, JWT_SECRET);
         res.status(200).json({
             status: true,
             message: '登入成功',
@@ -130,7 +130,7 @@ export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _ne
     } else {
         // console.log('需註冊');
         const rescustomer = await customer.create({ email, customerName: name, image: picture });
-        const token = jwt.sign({ data }, JWT_SECRET);
+        const token = jwt.sign({ name, email }, JWT_SECRET);
         res.status(200).json({
             status: true,
             message: '登入成功',
