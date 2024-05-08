@@ -14,6 +14,10 @@ declare global {
             EMAILER_USER: string;
             EMAILER_PASSWORD: string;
 
+            GOOGLE_CLIENT_ID: string;
+            GOOGLE_SECRET_KEY: string;
+            COOGLECAllBACK: string;
+
             NODE_ENV: 'development' | 'production';
         }
     }
