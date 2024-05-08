@@ -50,7 +50,7 @@ router.get('/google', UserController.passportScope);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 router.post(
     /**
-     * #swagger.description  = "取得使用者資訊"
+     * #swagger.description  = "google第三方登入"
      * #swagger.responses[200] = {
             schema: {
                 id: "663b9423ba76f3d8944cda27",
