@@ -1,7 +1,9 @@
 import { RequestHandler } from 'express';
+import { handleErrorAsync } from '@/utils/handleErorr';
 import axios from 'axios';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import customer from '@/models/customer';
 
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import express from 'express';
@@ -100,6 +102,7 @@ passport.use(
         }
     )
 );
+
 app.use(passport.initialize());
 
 export const passportScope = passport.authenticate('google', {
@@ -108,9 +111,31 @@ export const passportScope = passport.authenticate('google', {
 
 export const passportSession = passport.authenticate('google', { session: false });
 
-export const passportFun: RequestHandler = (req, res) => {
-    console.log(req.user?._json);
+export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const data = req.user?._json;
-    const token = jwt.sign({ data }, JWT_SECRET);
-    res.status(200).json({ message: 'true', token });
-};
+    const { name, email, picture } = data!;
+
+    const resuser = await customer.findOne({ email });
+    //先判斷有沒有這個email
+    if (resuser !== null) {
+        // console.log('不需註冊,直接返回');
+        const token = jwt.sign({ data }, JWT_SECRET);
+        res.status(200).json({
+            status: true,
+            message: '登入成功',
+            id: resuser._id,
+            token
+        });
+        return;
+    } else {
+        // console.log('需註冊');
+        const rescustomer = await customer.create({ email, customerName: name, image: picture });
+        const token = jwt.sign({ data }, JWT_SECRET);
+        res.status(200).json({
+            status: true,
+            message: '登入成功',
+            id: rescustomer._id,
+            token
+        });
+    }
+});
