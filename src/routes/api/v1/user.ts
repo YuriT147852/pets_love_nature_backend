@@ -48,6 +48,22 @@ router.get(
 router.get('/google', UserController.passportScope);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-router.post('/googleCallback', UserController.passportSession, UserController.passportFun);
+router.post(
+    /**
+     * #swagger.description  = "取得使用者資訊"
+     * #swagger.responses[200] = {
+            schema: {
+                id: "663b9423ba76f3d8944cda27",
+                message: "登入成功,
+                "status": true,
+                "token": "eyJhbGciOiJI....",
+            }
+        }
+     */
+    '/googlesignin',
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    UserController.passportSession,
+    UserController.passportFun
+);
 
 export default router;
