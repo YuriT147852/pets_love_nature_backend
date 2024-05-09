@@ -1,6 +1,6 @@
 import express from 'express';
 import * as UserController from '@/controllers/user';
-import { isAuth } from '@/middlewares';
+// import { isAuth } from '@/middlewares';
 
 const router = express.Router();
 
@@ -22,26 +22,6 @@ router.post(
      */
     '/githubLogin',
     UserController.githubLogin
-);
-
-// 取得使用者資訊
-router.get(
-    /**
-     * #swagger.description  = "取得使用者資訊"
-     * #swagger.responses[200] = {
-            schema: {
-                "status": true,
-                "token": "eyJhbGciOiJI....",
-                "result": {
-                    "name": "Lori Murphy",
-                    "email": "timmothy.ramos@example.com"
-                }
-            }
-        }
-     */
-    '/getInfo',
-    isAuth,
-    UserController.getInfo
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

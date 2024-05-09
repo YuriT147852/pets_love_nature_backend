@@ -67,6 +67,7 @@ const customerSchema = new Schema<Customer>(
         }
     },
     {
+        versionKey: false,
         timestamps: true // 自動生成創立跟更新時間
     }
 );

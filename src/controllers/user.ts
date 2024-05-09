@@ -17,6 +17,7 @@ const GITHUB_CONFIG = {
     clientSecret: GITHUB_SECRET,
     redirectURI: `${HOST}/callback`
 };
+
 export const githubLogin: RequestHandler = (_req, res, next) => {
     try {
         const authURL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CONFIG.clientID}&redirect_uri=${GITHUB_CONFIG.redirectURI}&scope=user:email`;
@@ -24,13 +25,6 @@ export const githubLogin: RequestHandler = (_req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
-
-export const getInfo: RequestHandler = (req, res) => {
-    res.send({
-        status: true,
-        result: req.user
-    });
 };
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
