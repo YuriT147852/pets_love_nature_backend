@@ -4,6 +4,7 @@ import axios from 'axios';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import customer from '@/models/customer';
+import { AppError } from '@/service/AppError';
 
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import express from 'express';
@@ -105,15 +106,36 @@ passport.use(
 
 app.use(passport.initialize());
 
-export const passportScope = passport.authenticate('google', {
-    scope: ['email', 'profile']
+export const passportScope: RequestHandler = handleErrorAsync(async (_req, _res, next) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await passport.authenticate('google', {
+        scope: ['email', 'profile']
+    })(_req, _res, next);
 });
 
-export const passportSession = passport.authenticate('google', { session: false });
-
 export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _next) => {
-    const data = req.user?._json;
-    const { name, email, picture } = data!;
+    const authenticate = () => {
+        return new Promise(resolve => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            passport.authenticate('google', { session: false }, (error, user) => {
+                if (error) {
+                    _next(AppError('Passport authentication error', 500));
+                    return;
+                } else if (!user) {
+                    _next(AppError('Passport authentication failed', 401));
+                    return;
+                }
+                resolve(user);
+            })(req, res, _next);
+        });
+    };
+
+    interface GoogleJson {
+        _json: { name: string; email: string; picture: string };
+    }
+
+    const googleRes = (await authenticate()) as GoogleJson;
+    const { name, email, picture } = googleRes._json;
 
     const resuser = await customer.findOne({ email });
     //先判斷有沒有這個email

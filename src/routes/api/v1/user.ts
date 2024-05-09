@@ -52,9 +52,10 @@ router.post(
     /**
      * #swagger.description  = "google第三方登入"
      * #swagger.responses[200] = {
+            description: '登入成功',
             schema: {
                 id: "663b9423ba76f3d8944cda27",
-                message: "登入成功,
+                message: "登入成功",
                 "status": true,
                 "token": "eyJhbGciOiJI....",
             }
@@ -62,7 +63,6 @@ router.post(
      */
     '/googlesignin',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    UserController.passportSession,
     UserController.passportFun
 );
 
