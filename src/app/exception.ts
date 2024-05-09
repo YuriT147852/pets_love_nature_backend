@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 
-import { handleMongooseError } from './mongooseErrors';
+import { handleNPMError } from './handleNPMError';
 
 interface CustomError extends Error {
     statusCode: number;
@@ -15,8 +15,8 @@ export const sendNotFoundError: RequestHandler = (_req, res) => {
 };
 
 export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, res, _next) => {
-    //mongo自訂錯誤
-    handleMongooseError(err, _req, res, _next);
+    //套件自訂錯誤
+    handleNPMError(err, _req, res, _next);
 
     //若已經發送給客戶端就不再發
     if (!res.headersSent) {
@@ -31,11 +31,12 @@ export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, re
             return;
         }
 
-        if (process.env.NODE_ENV === 'production')
+        if (process.env.NODE_ENV === 'production') {
             res.status(status).send({
                 status: false,
                 message: message
             });
+        }
     }
 };
 

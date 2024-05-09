@@ -45,5 +45,3 @@
 //     UserController.passportSession,
 //     UserController.passportFun
 // );
-
-// export default router;
