@@ -3,6 +3,28 @@ import * as CustomerController from '@/controllers/customer';
 
 const router = express.Router();
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+router.get('/google', CustomerController.passportScope);
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+router.post(
+    /**
+     * #swagger.description  = "google第三方登入"
+     * #swagger.responses[200] = {
+            schema: {
+                id: "663b9423ba76f3d8944cda27",
+                message: "登入成功,
+                "status": true,
+                "token": "eyJhbGciOiJI....",
+            }
+        }
+     */
+    '/googleSignin',
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    CustomerController.passportSession,
+    CustomerController.passportFun
+);
+
 // 查詢消費者資訊
 router.get(
     /**

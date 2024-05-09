@@ -1,6 +1,66 @@
-import { RequestHandler } from 'express';
+import express, { RequestHandler } from 'express';
+import { handleErrorAsync } from '@/utils/handleError';
 import { AppError } from '@/service/AppError';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import passport from 'passport';
+import jwt from 'jsonwebtoken';
 import CustomerModel from '@/models/customer';
+
+const app = express();
+
+//底下為google第三方
+const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, COOGLECAllBACK, JWT_SECRET } = process.env;
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: GOOGLE_CLIENT_ID,
+            clientSecret: GOOGLE_SECRET_KEY,
+            callbackURL: COOGLECAllBACK
+        },
+        (_accessToken, _refreshToken, profile, cb) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+            return cb(null, profile);
+        }
+    )
+);
+
+app.use(passport.initialize());
+
+export const passportScope = passport.authenticate('google', {
+    scope: ['email', 'profile']
+});
+
+export const passportSession = passport.authenticate('google', { session: false });
+
+export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+    const data = req.user?._json;
+    const { name, email, picture } = data!;
+
+    const resCustomer = await CustomerModel.findOne({ email });
+    //先判斷有沒有這個email
+    if (resCustomer !== null) {
+        // console.log('不需註冊,直接返回');
+        const token = jwt.sign({ name, email }, JWT_SECRET);
+        res.status(200).json({
+            status: true,
+            message: '登入成功',
+            id: resCustomer._id,
+            token
+        });
+        return;
+    } else {
+        // console.log('需註冊');
+        const resCustomer = await CustomerModel.create({ email, customerName: name, image: picture });
+        const token = jwt.sign({ name, email }, JWT_SECRET);
+        res.status(200).json({
+            status: true,
+            message: '登入成功',
+            id: resCustomer._id,
+            token
+        });
+    }
+});
+
 
 export const getInfo: RequestHandler = async (req, res, next) => {
     try {
