@@ -8,7 +8,6 @@ export interface IProductSpec extends Document {
   inStock: number;
   onlineStatus: boolean;
   onlineDate: Date;
-
 }
 
 const productSpecSchema = new Schema<IProductSpec>(
@@ -30,10 +29,12 @@ const productSpecSchema = new Schema<IProductSpec>(
       required: [true, '商品價格 未填寫']
     },
     inStock: {
-      type: Number
+      type: Number,
+      default: 0
     },
     onlineStatus: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     onlineDate: {
       type: Date,
