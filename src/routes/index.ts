@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import swagger from './swagger';
 import customer from './api/v1/customer';
+import product from './api/v1/product';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -23,6 +24,14 @@ routes.use(
      */
     '/api/v1/customer',
     customer
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Product - 商品"]
+     */
+    '/api/v1/product',
+    product
 );
 
 export default routes;
