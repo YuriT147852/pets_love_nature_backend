@@ -3,15 +3,13 @@ import { handleErrorAsync } from '@/utils/handleError';
 import { AppError } from '@/service/AppError';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';
-import jwt from 'jsonwebtoken';
 import CustomerModel from '@/models/customer';
-
-
+import { generateToken } from '@/utils/index';
 
 const app = express();
 
 // 底下為google第三方
-const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, COOGLECAllBACK, JWT_SECRET } = process.env;
+const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, COOGLECAllBACK } = process.env;
 passport.use(
     new GoogleStrategy(
         {
@@ -28,16 +26,14 @@ passport.use(
 
 app.use(passport.initialize());
 
-export const passportScope: RequestHandler = handleErrorAsync(async (_req, _res, next) => {
+export const passportGoogleScope: RequestHandler = handleErrorAsync(async (_req, _res, next) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await passport.authenticate('google', {
         scope: ['email', 'profile']
     })(_req, _res, next);
 });
 
-export const passportSession = passport.authenticate('google', { session: false });
-
-export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const authenticate = () => {
         return new Promise(resolve => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -62,10 +58,11 @@ export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _ne
     const { name, email, picture } = googleRes._json;
 
     const resCustomer = await CustomerModel.findOne({ email });
+    // console.log(resCustomer);
     //先判斷有沒有這個email
     if (resCustomer !== null) {
-        // console.log('不需註冊,直接返回');
-        const token = jwt.sign({ name, email }, JWT_SECRET);
+        // console.log('不須註冊');
+        const token = generateToken({ userId: resCustomer._id });
         res.status(200).json({
             status: true,
             message: '登入成功',
@@ -76,7 +73,7 @@ export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _ne
     } else {
         // console.log('需註冊');
         const resCustomer = await CustomerModel.create({ email, customerName: name, image: picture });
-        const token = jwt.sign({ name, email }, JWT_SECRET);
+        const token = generateToken({ userId: resCustomer._id });
         res.status(200).json({
             status: true,
             message: '登入成功',
@@ -89,12 +86,8 @@ export const passportFun: RequestHandler = handleErrorAsync(async (req, res, _ne
 export const getInfo: RequestHandler = async (req, res, next) => {
     try {
         const result = await CustomerModel.findOne({
-            _id: req.params.id,
+            _id: req.params.id
         });
-        if (!result) {
-            next(AppError('消費者資訊不存在', 404));
-            return;
-        }
         res.send({
             status: true,
             result
@@ -111,12 +104,7 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
             phone,
             image,
             recipientName,
-            deliveryAddress: {
-                country,
-                county,
-                district,
-                address
-            }
+            deliveryAddress: { country, county, district, address }
         } = req.body;
 
         const result = await CustomerModel.findByIdAndUpdate(
@@ -150,4 +138,3 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         next(error);
     }
 };
-

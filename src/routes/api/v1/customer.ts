@@ -2,11 +2,8 @@ import express from 'express';
 import * as CustomerController from '@/controllers/customer';
 
 const router = express.Router();
+router.get('/google', CustomerController.passportGoogleScope);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-router.get('/google', CustomerController.passportScope);
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 router.post(
     /**
      * #swagger.description  = "google第三方登入"
@@ -21,8 +18,7 @@ router.post(
      */
     '/googleSignin',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    CustomerController.passportSession,
-    CustomerController.passportFun
+    CustomerController.passportGoogleCallback
 );
 
 // 查詢消費者資訊

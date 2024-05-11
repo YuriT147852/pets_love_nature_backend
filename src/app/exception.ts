@@ -1,7 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
-
 import { handleNPMError } from './handleNPMError';
-
 interface CustomError extends Error {
     statusCode: number;
     isOperational: boolean;
@@ -14,10 +12,9 @@ export const sendNotFoundError: RequestHandler = (_req, res) => {
     });
 };
 
-export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, res, _next) => {
-    //套件自訂錯誤
-    handleNPMError(err, _req, res, _next);
+export const NpmError: ErrorRequestHandler = handleNPMError;
 
+export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, res, _next) => {
     //若已經發送給客戶端就不再發
     if (!res.headersSent) {
         const status = err.statusCode || 500;

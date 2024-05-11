@@ -17,7 +17,7 @@ export const handleNPMError: ErrorRequestHandler = (err, _req, res, _next): void
     } else if (err instanceof mongoose.Error.CastError) {
         res.status(400).json({
             status: false,
-            message: `錯誤id: ${err.value}`
+            message: err.message
         });
         return;
     } else {

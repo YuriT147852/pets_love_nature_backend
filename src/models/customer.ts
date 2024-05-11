@@ -50,7 +50,7 @@ const customerSchema = new Schema<Customer>(
         },
         email: {
             type: String,
-            required: true,
+            required: [true, '使用者email未填寫'],
             unique: true
         },
         customerName: {
@@ -59,7 +59,7 @@ const customerSchema = new Schema<Customer>(
         },
         image: {
             type: String,
-            required: true
+            required: [true, '使用者大頭照未填寫']
         },
         accountStatus: {
             type: Number,
