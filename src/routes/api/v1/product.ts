@@ -39,4 +39,12 @@ router.get(
     ProductController.getProductById
 );
 
+router.post(
+    /**
+     * #swagger.description  = "新增商品"
+     */
+    '/',
+    ProductController.createOneOrder
+);
+
 export default router;

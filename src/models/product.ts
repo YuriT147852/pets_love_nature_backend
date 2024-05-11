@@ -26,7 +26,8 @@ const productSchema = new Schema<IProduct>(
       type: String
     },
     star: {
-      type: Number
+      type: Number,
+      default: 0
     },
     productNumber: {
       type: String
