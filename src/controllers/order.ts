@@ -17,7 +17,7 @@ export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, _
     }
     res.status(200).json({
         message: '成功',
-        result
+        data: result
     });
 });
 
@@ -32,6 +32,6 @@ export const getOrders: RequestHandler = handleErrorAsync(async (req, res, _next
     }
     res.status(200).json({
         message: '成功',
-        result
+        data: result
     });
 });
