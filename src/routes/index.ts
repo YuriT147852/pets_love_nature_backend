@@ -33,6 +33,10 @@ routes.use(
      */
     '/api/v1/',
     order
+);
+
+routes.use(
+    /**
      * #swagger.tags = ["Product - 商品"]
      */
     '/api/v1/product',
