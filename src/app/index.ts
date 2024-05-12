@@ -33,6 +33,7 @@ app.use(morgan('dev'));
 app.use(Routes);
 
 app.use(exception.sendNotFoundError);
+app.use(exception.NpmError);
 app.use(exception.catchCustomError);
 app.use('/', indexRouter);
 

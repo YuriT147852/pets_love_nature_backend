@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import swagger from './swagger';
 import customer from './api/v1/customer';
+import order from './api/v1/order';
 import product from './api/v1/product';
 
 // import user from './api/v1/user';
@@ -28,6 +29,10 @@ routes.use(
 
 routes.use(
     /**
+     * #swagger.tags = ["Customer - 消費者"]
+     */
+    '/api/v1/',
+    order
      * #swagger.tags = ["Product - 商品"]
      */
     '/api/v1/product',
