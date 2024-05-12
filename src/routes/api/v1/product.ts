@@ -15,7 +15,7 @@ router.get(
             }
         }
      */
-    '/',
+    '',
     ProductController.getProductList
 );
 
@@ -68,7 +68,7 @@ router.post(
             }
         }
      */
-    '/',
+    '',
     ProductController.createOneOrder
 );
 
