@@ -1,6 +1,6 @@
 import express from 'express';
 import * as OrderController from '@/controllers/order';
-
+import { isAuth } from '@/service/isAuth';
 const router = express.Router();
 
 router.get(
@@ -23,7 +23,9 @@ router.get(
         }
     }
  */
+
     '/orders/:userid',
+    isAuth,
     OrderController.getOrdersList
 );
 
