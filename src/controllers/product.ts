@@ -2,19 +2,24 @@ import type { RequestHandler } from 'express';
 import { AppError } from '@/service/AppError';
 import ProductModel from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
+import { handleErrorAsync } from '@/utils/handleError';
 
-export const getProductList: RequestHandler = async (_req, res, _next) => {
+export const getProductList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
     const result = await ProductSpecModel.find({}).populate({
         path: 'productId',
         select: 'title subtitle description star category otherInfo imageGallery'
     });
+    if (result.length === 0) {
+        next(AppError('無商品資料', 404));
+        return;
+    }
     res.send({
         status: true,
         result
     });
-};
+});
 
-export const getProductById: RequestHandler = async (req, res, next) => {
+export const getProductById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await ProductSpecModel.findOne({
         _id: req.params.id
     }).populate({
@@ -31,9 +36,10 @@ export const getProductById: RequestHandler = async (req, res, next) => {
         status: true,
         result
     });
-};
+});
 
-export const createOneOrder: RequestHandler = async (req, res, next) => {
+
+export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, next) => {
     try {
         // TODO: 未完成 1.欄位 2.SPEC若有多種須加上迴圈
         // 1.先建立商品訊息
@@ -61,7 +67,8 @@ export const createOneOrder: RequestHandler = async (req, res, next) => {
             status: true,
             resultProductSpec
         });
+
     } catch (error) {
         next(error);
     }
-};
+});
