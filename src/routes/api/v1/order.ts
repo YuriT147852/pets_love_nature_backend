@@ -1,6 +1,6 @@
 import express from 'express';
 import * as OrderController from '@/controllers/order';
-import { isAuth } from '@/service/isAuth';
+import { isAuth } from '@/utils/isAuth';
 const router = express.Router();
 
 router.get(
@@ -24,7 +24,7 @@ router.get(
     }
  */
 
-    '/orders/:userid',
+    '/orders/:userId',
     isAuth,
     OrderController.getOrdersList
 );
@@ -56,7 +56,7 @@ router.get(
                     "shippingUserName": "2024-04-15T12:30:00.000Z",
                     "deliveryAddress": {
                         "country": "台灣",
-                        "conuty": "台北市",
+                        "county": "台北市",
                         "district": "信義區",
                         "address": "快樂鎮1234號5樓"
                     },
@@ -67,7 +67,7 @@ router.get(
         }
     }
  */
-    '/order/:orderid',
+    '/order/:orderId',
     OrderController.getOrders
 );
 

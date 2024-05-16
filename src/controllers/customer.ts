@@ -1,10 +1,10 @@
 import express, { RequestHandler } from 'express';
-import { handleErrorAsync } from '@/utils/handleError';
-import { AppError } from '@/service/AppError';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';
-import CustomerModel from '@/models/customer';
+import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
+import { successResponse } from '@/utils/successHandler';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { generateToken } from '@/utils/index';
+import CustomerModel from '@/models/customer';
 
 const app = express();
 
@@ -33,20 +33,20 @@ export const passportGoogleScope: RequestHandler = handleErrorAsync(async (_req,
     })(_req, _res, next);
 });
 
-export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const authenticate = () => {
         return new Promise(resolve => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             passport.authenticate('google', { session: false }, (error, user) => {
                 if (error) {
-                    _next(AppError('Passport authentication error', 500));
+                    next(errorResponse(500, 'Passport authentication error'));
                     return;
                 } else if (!user) {
-                    _next(AppError('Passport authentication failed', 401));
+                    next(errorResponse(401, 'Passport authentication failed'));
                     return;
                 }
                 resolve(user);
-            })(req, res, _next);
+            })(req, res, next);
         });
     };
 
@@ -63,23 +63,29 @@ export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (re
     if (resCustomer !== null) {
         // console.log('不須註冊');
         const token = generateToken({ userId: resCustomer._id });
-        res.status(200).json({
-            status: true,
-            message: '登入成功',
-            id: resCustomer._id,
-            token
-        });
+        res.status(200).json(
+            successResponse({
+                message: '登入成功',
+                data: {
+                    id: resCustomer._id,
+                    token
+                },
+            }),
+        );
         return;
     } else {
         // console.log('需註冊');
         const resCustomer = await CustomerModel.create({ email, customerName: name, image: picture });
         const token = generateToken({ userId: resCustomer._id });
-        res.status(200).json({
-            status: true,
-            message: '登入成功',
-            id: resCustomer._id,
-            token
-        });
+        res.status(200).json(
+            successResponse({
+                message: '第一次註冊+登入成功',
+                data: {
+                    id: resCustomer._id,
+                    token
+                },
+            }),
+        );
     }
 });
 
@@ -88,10 +94,12 @@ export const getInfo: RequestHandler = async (req, res, next) => {
         const result = await CustomerModel.findOne({
             _id: req.params.id
         });
-        res.send({
-            status: true,
-            result
-        });
+        res.status(200).json(
+            successResponse({
+                message: '取得會員資訊成功',
+                data: result,
+            }),
+        );
     } catch (error) {
         next(error);
     }
@@ -127,13 +135,15 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
             }
         );
         if (!result) {
-            next(AppError('消費者資訊不存在', 404));
+            next(errorResponse(404, '會員資訊不存在'));
             return;
         }
-        res.send({
-            status: true,
-            result
-        });
+        res.status(200).json(
+            successResponse({
+                message: '更新會員資訊成功',
+                data: result,
+            }),
+        );
     } catch (error) {
         next(error);
     }
