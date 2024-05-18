@@ -112,7 +112,9 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
             phone,
             image,
             recipientName,
-            deliveryAddress: { country, county, district, address }
+            recipientPhone,
+            recipientAddress: { country, county, district, address }, // 收件人地址資訊
+            deliveryAddress: { country: deliveryCountry, county: deliveryCounty, district: deliveryDistrict, address: deliveryAddress } // 預填的會員地址資訊
         } = req.body;
 
         const result = await CustomerModel.findByIdAndUpdate(
@@ -122,11 +124,18 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
                 phone,
                 image,
                 recipientName,
-                deliveryAddress: {
+                recipientPhone,
+                recipientAddress: {
                     country,
                     county,
                     district,
                     address
+                },
+                deliveryAddress: {
+                    country: deliveryCountry,
+                    county: deliveryCounty,
+                    district: deliveryDistrict,
+                    address: deliveryAddress
                 }
             },
             {

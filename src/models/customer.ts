@@ -8,15 +8,17 @@ interface DeliveryAddress {
 }
 
 interface Customer extends Document {
-    //收件人姓名
+    // 收件人姓名
     recipientName: string;
-    //顧客姓名,第三方傳入
+    recipientAddress: DeliveryAddress;
+    recipientPhone: string;
+    // 顧客姓名, 第三方傳入
     customerName: string;
-    phone: string;
     deliveryAddress: DeliveryAddress;
+    phone: string;
     email: string;
     image: string;
-    accountStatus: number;
+    accountStatus: number; // 會員狀態(是否黑名單)
 }
 
 const deliveryAddressSchema = new Schema<DeliveryAddress>(
@@ -34,6 +36,19 @@ const customerSchema = new Schema<Customer>(
         recipientName: {
             type: String,
             default: null
+        },
+        recipientPhone: {
+            type: String,
+            default: null
+        },
+        recipientAddress: {
+            type: deliveryAddressSchema,
+            default: {
+                country: null,
+                county: null,
+                district: null,
+                address: null
+            }
         },
         phone: {
             type: String,
