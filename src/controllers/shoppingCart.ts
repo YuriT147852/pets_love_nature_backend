@@ -13,13 +13,18 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
         .populate({
             path: 'shoppingCart.productId',
             select: '_id title productNumber imageGallery'
+        })
+        .populate({
+            path: 'shoppingCart.productSpec',
+            select: 'productNumber weight price inStock onlineStatus'
         });
+
 
     if (!result) {
         next(errorResponse(404, "此customer id不存在"));
         return;
     }
-    
+
     res.send({
         status: true,
         data: result
