@@ -8,9 +8,9 @@ router.use('/swagger', swaggerUi.serve, (req: Request, res: Response, next: Next
     swaggerSpec.host = `${req.headers.host}`;
 
     // test
-    // if (process.env.NODE_ENV === 'production') {
-    swaggerSpec.schemes = ['https'];
-    // }
+    if (process.env.NODE_ENV === 'production') {
+        swaggerSpec.schemes = ['https'];
+    }
 
     const opts = {
         customFavIcon: '/public/favicon.ico',
