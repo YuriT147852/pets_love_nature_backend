@@ -67,7 +67,6 @@ router.put(
             required: true,
             schema: {
                     "customerName": "王大頭",
-                    "recipientName": "王大頭",
                     "phone": "0978071727",
                     "deliveryAddress": {
                         "country": "台灣",
@@ -75,8 +74,15 @@ router.put(
                         "district": "信義區",
                         "address": "快樂鎮1234號5樓"
                     },
-                    "image": "",
-                
+                    "recipientName": "王大頭",
+                    "recipientPhone": "0978071727",
+                    "recipientAddress": {
+                        "country": "台灣",
+                        "county": "台北市",
+                        "district": "信義區",
+                        "address": "快樂鎮1234號5樓"
+                    },
+                    "image": ""
             }
         }
      * #swagger.responses[404] = {

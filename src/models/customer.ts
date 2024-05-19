@@ -74,7 +74,7 @@ const customerSchema = new Schema<Customer>(
         },
         image: {
             type: String,
-            required: [true, '使用者大頭照未填寫']
+            required: [false, '使用者大頭照未填寫']
         },
         accountStatus: {
             type: Number,
