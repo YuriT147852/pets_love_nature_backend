@@ -62,7 +62,7 @@ routes.use(
 );
 routes.use(
     /**
-     * #swagger.tags = ["Admin / Product - 管理者 / 商品"]
+     * #swagger.tags = ["shoppingcart - 購物車"]
      */
     '/api/v1/shopping_cart',
     shoppingCart
