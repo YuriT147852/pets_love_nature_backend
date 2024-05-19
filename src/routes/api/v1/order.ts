@@ -68,6 +68,7 @@ router.get(
     }
  */
     '/order/:orderId',
+    isAuth,
     OrderController.getOrders
 );
 
