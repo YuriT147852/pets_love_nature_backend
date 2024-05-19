@@ -3,6 +3,7 @@ import swagger from './swagger';
 import customer from './api/v1/customer';
 import order from './api/v1/order';
 import product from './api/v1/product';
+import adminProduct from './api/v1/admin/product';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -41,6 +42,22 @@ routes.use(
      */
     '/api/v1/product',
     product
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Product - 商品"]
+     */
+    '/api/v1/product',
+    product
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Admin / Product - 管理者 / 商品"]
+     */
+    '/api/v1/admin/product',
+    adminProduct
 );
 
 export default routes;
