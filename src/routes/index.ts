@@ -4,6 +4,7 @@ import customer from './api/v1/customer';
 import order from './api/v1/order';
 import product from './api/v1/product';
 import adminProduct from './api/v1/admin/product';
+import shoppingCart from './api/v1/shoppingCart';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -58,6 +59,13 @@ routes.use(
      */
     '/api/v1/admin/product',
     adminProduct
+);
+routes.use(
+    /**
+     * #swagger.tags = ["shoppingcart - 購物車"]
+     */
+    '/api/v1/shopping_cart',
+    shoppingCart
 );
 
 export default routes;
