@@ -16,7 +16,7 @@ router.post(
             }
         }
      */
-    '/googleSignin',
+    '/googleSignIn',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     CustomerController.passportGoogleCallback
 );
