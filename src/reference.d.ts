@@ -16,7 +16,7 @@ declare global {
 
             GOOGLE_CLIENT_ID: string;
             GOOGLE_SECRET_KEY: string;
-            COOGLECAllBACK: string;
+            GOOGLE_CAllBACK: string;
 
             NODE_ENV: 'development' | 'production';
         }

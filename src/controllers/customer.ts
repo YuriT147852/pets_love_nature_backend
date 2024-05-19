@@ -9,13 +9,13 @@ import CustomerModel from '@/models/customer';
 const app = express();
 
 // 底下為google第三方
-const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, COOGLECAllBACK } = process.env;
+const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, GOOGLE_CAllBACK } = process.env;
 passport.use(
     new GoogleStrategy(
         {
             clientID: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_SECRET_KEY,
-            callbackURL: COOGLECAllBACK
+            callbackURL: GOOGLE_CAllBACK
         },
         (_accessToken, _refreshToken, profile, cb) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
@@ -69,8 +69,8 @@ export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (re
                 data: {
                     id: resCustomer._id,
                     token
-                },
-            }),
+                }
+            })
         );
         return;
     } else {
@@ -83,8 +83,8 @@ export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (re
                 data: {
                     id: resCustomer._id,
                     token
-                },
-            }),
+                }
+            })
         );
     }
 });
@@ -97,8 +97,8 @@ export const getInfo: RequestHandler = async (req, res, next) => {
         res.status(200).json(
             successResponse({
                 message: '取得會員資訊成功',
-                data: result,
-            }),
+                data: result
+            })
         );
     } catch (error) {
         next(error);
@@ -114,7 +114,12 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
             recipientName,
             recipientPhone,
             recipientAddress: { country, county, district, address }, // 收件人地址資訊
-            deliveryAddress: { country: deliveryCountry, county: deliveryCounty, district: deliveryDistrict, address: deliveryAddress } // 預填的會員地址資訊
+            deliveryAddress: {
+                country: deliveryCountry,
+                county: deliveryCounty,
+                district: deliveryDistrict,
+                address: deliveryAddress
+            } // 預填的會員地址資訊
         } = req.body;
 
         const result = await CustomerModel.findByIdAndUpdate(
@@ -150,8 +155,8 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         res.status(200).json(
             successResponse({
                 message: '更新會員資訊成功',
-                data: result,
-            }),
+                data: result
+            })
         );
     } catch (error) {
         next(error);
