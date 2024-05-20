@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import firebase from 'firebase-admin';
+import firebaseAdmin from 'firebase-admin';
 
 const config = {
   type: process.env.FIREBASE_TYPE,
@@ -14,11 +14,11 @@ const config = {
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
 };
 
-firebase.initializeApp({
-  credential: firebase.credential.cert(config),
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(config),
   storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
 });
 
 
 
-module.exports = firebase;
+export default firebaseAdmin;
