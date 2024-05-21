@@ -5,7 +5,7 @@ import order from './api/v1/order';
 import product from './api/v1/product';
 import adminProduct from './api/v1/admin/product';
 import shoppingCart from './api/v1/shoppingCart';
-import upload from './api/v1/admin/upload';
+// import upload from './api/v1/admin/upload';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -70,12 +70,12 @@ routes.use(
     shoppingCart
 );
 
-routes.use(
-    /**
-     * #swagger.tags = ["Admin / Upload - 管理者 / 上傳檔案"]
-     */
-    '/api/v1/admin/upload',
-    upload
-);
+// routes.use(
+//     /**
+//      * #swagger.tags = ["Admin / Upload - 管理者 / 上傳檔案"]
+//      */
+//     '/api/v1/admin/upload',
+//     upload
+// );
 
 export default routes;
