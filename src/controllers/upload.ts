@@ -5,11 +5,11 @@ import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
 
 const bucket = firebaseAdmin.storage().bucket()
-export const uploadFile: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const uploadFile: RequestHandler = handleErrorAsync((req, res, _next) => {
   // 取得上傳的檔案資訊
-  const file = req.file
+  const file = req.file as Express.Multer.File
   if (!file) {
-    return errorResponse(400, '未找到檔案')
+    errorResponse(400, '未找到檔案')
   }
 
   // 基於檔案的原始名稱建立一個 blob 物件
@@ -28,8 +28,9 @@ export const uploadFile: RequestHandler = handleErrorAsync(async (req, res, _nex
     // 取得檔案的網址
     blob.getSignedUrl(config, (err, imgUrl) => {
       if (err || !imgUrl) {
-        return errorResponse(404, '上傳失敗')
+        errorResponse(404, '上傳失敗')
       }
+
       res.status(200).json(
         successResponse({
           message: '上傳成功',
@@ -41,7 +42,7 @@ export const uploadFile: RequestHandler = handleErrorAsync(async (req, res, _nex
 
   // 如果上傳過程中發生錯誤,會觸發 error 事件
   blobStream.on('error', () => {
-    return errorResponse(404, '傳過程中發生錯誤')
+    errorResponse(404, '傳過程中發生錯誤')
   })
 
   // 將檔案的 buffer 寫入 blobStream
