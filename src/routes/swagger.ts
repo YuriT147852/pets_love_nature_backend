@@ -9,7 +9,7 @@ router.use('/swagger', swaggerUi.serve, (req: Request, res: Response, next: Next
 
     // test
     // if (process.env.NODE_ENV === 'production') {
-    swaggerSpec.schemes = ['https'];
+    swaggerSpec.schemes = ['https', 'http'];
     // }
 
     const opts = {

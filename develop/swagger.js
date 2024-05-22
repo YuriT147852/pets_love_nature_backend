@@ -7,7 +7,7 @@ const doc = {
         description: `我們的創立理念是基於對寵物健康的極端關注和對食品純淨性的不懈追求。
     `
     },
-    schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
+    // schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
     securityDefinitions: {
         bearerAuth: {
             type: 'apiKey',
