@@ -1,7 +1,9 @@
 import express from 'express';
 import * as CustomerController from '@/controllers/customer';
+import { isAuth } from '@/utils/isAuth';
 
 const router = express.Router();
+
 router.get('/google', CustomerController.passportGoogleScope);
 
 router.post(
@@ -54,7 +56,7 @@ router.get(
             }
         }
      */
-    '/:id',
+    '/:id', isAuth,
     CustomerController.getInfo
 );
 
@@ -92,7 +94,7 @@ router.put(
             }
         }
      */
-    '/:id',
+    '/:id', isAuth,
     CustomerController.updateInfo
 );
 
