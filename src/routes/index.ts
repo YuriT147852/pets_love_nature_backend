@@ -6,6 +6,7 @@ import product from './api/v1/product';
 import adminProduct from './api/v1/admin/product';
 import shoppingCart from './api/v1/shoppingCart';
 import upload from './api/v1/admin/upload';
+import adminOrder from '@/routes/api/v1/admin/order';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -60,6 +61,14 @@ routes.use(
      */
     '/api/v1/admin/product',
     adminProduct
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Admin / Product - 管理者 / 訂單"]
+     */
+    '/api/v1/admin',
+    adminOrder
 );
 
 routes.use(
