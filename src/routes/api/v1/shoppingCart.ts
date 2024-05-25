@@ -90,4 +90,9 @@ router.post(
     CartController.addCart
 )
 
+router.delete(
+    "",
+    CartController.deleteCart
+)
+
 export default router;

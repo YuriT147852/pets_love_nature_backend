@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { RequestHandler } from 'express';
 import shoppingCartModel from '@/models/shoppingCart';
-import {errorResponse, handleErrorAsync } from '@/utils/errorHandler';
+import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 
 export const getCartById: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    console.log('getShoppingCartById');
-    console.log('req.params.id', req.params.id);
 
     const result = await shoppingCartModel
         .findOne({
@@ -16,71 +14,122 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
             path: 'shoppingCart.productSpec',
             select: 'productNumber weight price inStock onlineStatus',
             populate: {
-                path: "productId",
+                path: 'productId',
                 select: '_id title productNumber imageGallery'
             }
         });
-
-
-        // const collateResultArr = result?.shoppingCart.map(eachProduct => {
-
-        //     // const product = eachProduct.productSpec.productId;
-            
-        //     const obj = {
-        //         // product, ...eachProduct
-        //     }
-        //     return obj
-        // })
-
-        // .populate({
-        //     path: 'shoppingCart.productId',
-        //     select: '_id title productNumber imageGallery',
-        // })
-        // .populate({
-        //     path: 'shoppingCart.productSpec',
-        //     select: 'productNumber weight price inStock onlineStatus'
-        // });
-
-
     if (!result) {
-        next(errorResponse(404, "此customer id不存在"));
+        next(errorResponse(404, '此customer id不存在'));
         return;
     }
 
     res.status(200).json(
         successResponse({
             message: '取得購物車資料成功',
-            data: result,
-        }),
+            data: result
+        })
     );
 });
 
+export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) => {
 
-
-export const addCart: RequestHandler = handleErrorAsync(async(req, res, _next) => {
-
-    console.log('req.body', req.body);
-    console.log('addCart');
-
-    const customerId = req.body.customerId;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const addIsChoosedCart = req.body.shoppingCart.map((eachCart: object) => {
-        const obj:object = {
-            ...eachCart,
-            isChoosed: false
-        }
-        console.log('obj', obj);
-        return obj
-    })
-
-    console.log('addIsChoosedCart', addIsChoosedCart);
-    const addCartFu = await shoppingCartModel.create({
-        customerId,
-        shoppingCart: addIsChoosedCart
-    })
-
-    res.status(200).json({
-        message: '成功',
-        data: addCartFu
+    const { customerId, shoppingCart, addWay } = req.body;
+    const customerData = await shoppingCartModel.findOne({
+        customerId: customerId
     });
-})
+
+
+    // 如果購物車資料庫沒有該使用者
+    if (!customerData) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        const addIsChoosedCart = shoppingCart.map((eachCart: object) => {
+            const obj: object = {
+                ...eachCart,
+                isChoosed: false
+            };
+            return obj;
+        });
+
+        const addCartFu = await shoppingCartModel.create({
+            customerId,
+            shoppingCart: addIsChoosedCart
+        });
+
+        res.status(200).json(
+            successResponse({
+                message: '成功',
+                data: addCartFu
+            })
+        );
+    } else {
+        // 如果有該使用者，則更新購物車
+
+        for (let i = 0; i < shoppingCart.length; i++) {
+            let findStatus = false;
+            for (let j = 0; j < customerData.shoppingCart.length; j++) {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                if (shoppingCart[i].productSpec === customerData.shoppingCart[j].productSpec.toString()) {
+                    findStatus = true;
+                    if (addWay === 0) {
+                        // 加數量 用於除了購物車以外的介面
+                        customerData.shoppingCart[j].quantity += shoppingCart[i].quantity;
+                    } else if (addWay === 1) {
+                        // 調整數量 用於購物車介面
+                        customerData.shoppingCart[j].quantity = shoppingCart[i].quantity;
+                    }
+                }
+            }
+
+            if(!findStatus) {
+                const targetDetail = shoppingCart[0];
+                const obj = {
+                    isChoosed: false,
+                    productSpec: targetDetail.productSpec,
+                    quantity: targetDetail.quantity
+                }
+                customerData.shoppingCart.push(obj)
+            }
+        }
+        await customerData.save(); // 更新
+
+        res.status(200).json(
+            successResponse({
+                message: '成功',
+                data: customerData.shoppingCart
+            })
+        );
+    }
+});
+
+export const deleteCart: RequestHandler = handleErrorAsync(async (req, res, next) => {
+
+    const { customerId, productSpec } = req.body;
+    const customerData = await shoppingCartModel.findOne({
+        customerId: customerId
+    });
+
+    if (!customerData) {
+        // 無此使用者
+        next(errorResponse(400, '無此使用者'));
+        return;
+    } else {
+        // 有此使用者
+        for (let j = 0; j < customerData.shoppingCart.length; j++) {
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
+            if (productSpec === customerData.shoppingCart[j].productSpec.toString()) {
+                // 加數量 用於除了購物車以外的介面
+                customerData.shoppingCart.splice(j, 1);
+            }
+        }
+    }
+
+    await customerData.save();
+
+    res.status(200).json(
+        successResponse({
+            message: '成功',
+            data: '刪除成功'
+        })
+    );
+    // }
+});
