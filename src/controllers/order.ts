@@ -118,6 +118,25 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
     //搜尋為email
     if (searchType === 'email') {
         const result = await CustomerModel.find({ email: filterHandler });
+        // console.log(result);
+
+        if (result.length === 0) {
+            const resData = {
+                OrderData: [],
+                page: {
+                    nowPage: page,
+                    totalPages: 0
+                }
+            };
+
+            res.status(200).json(
+                successResponse({
+                    message: '成功抓取訂單資訊',
+                    data: resData
+                })
+            );
+        }
+
         const formatResult = result.map(item => ({ userId: item['_id'] }));
 
         const totalDocuments = await OrderModel.find(
