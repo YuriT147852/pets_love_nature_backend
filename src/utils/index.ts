@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import jsonWebToken, { type JwtPayload } from 'jsonwebtoken';
 
+//前台使用
 export const generateToken = (payload: { userId?: string }) => {
     return jsonWebToken.sign(payload, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_DAY
@@ -10,6 +11,21 @@ export const generateToken = (payload: { userId?: string }) => {
 export const verifyToken = (token: string) => {
     try {
         return jsonWebToken.verify(token, process.env.JWT_SECRET) as JwtPayload;
+    } catch (error) {
+        throw createHttpError(403, '請重新登入');
+    }
+};
+
+//後台使用
+export const generateToken_BACK = (payload: { account?: string }) => {
+    return jsonWebToken.sign(payload, process.env.JWt_BACK_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_DAY
+    });
+};
+
+export const verifyToken_Back = (token: string) => {
+    try {
+        return jsonWebToken.verify(token, process.env.JWt_BACK_SECRET) as JwtPayload;
     } catch (error) {
         throw createHttpError(403, '請重新登入');
     }
