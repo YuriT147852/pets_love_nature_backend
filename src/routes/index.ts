@@ -7,6 +7,7 @@ import adminProduct from './api/v1/admin/product';
 import shoppingCart from './api/v1/shoppingCart';
 import upload from './api/v1/admin/upload';
 import adminOrder from '@/routes/api/v1/admin/order';
+import admin from '@/routes/api/v1/admin/index';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -57,6 +58,22 @@ routes.use(
 
 routes.use(
     /**
+     * #swagger.tags = ["shoppingcart - 購物車"]
+     */
+    '/api/v1/shopping_cart',
+    shoppingCart
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Admin / Product - 管理者 / 會員 "]
+     */
+    '/api/v1/admin',
+    admin
+);
+
+routes.use(
+    /**
      * #swagger.tags = ["Admin / Product - 管理者 / 商品"]
      */
     '/api/v1/admin/product',
@@ -69,14 +86,6 @@ routes.use(
      */
     '/api/v1/admin',
     adminOrder
-);
-
-routes.use(
-    /**
-     * #swagger.tags = ["shoppingcart - 購物車"]
-     */
-    '/api/v1/shopping_cart',
-    shoppingCart
 );
 
 routes.use(
