@@ -29,6 +29,8 @@ declare global {
             FIREBASE_CLIENT_X509_CERT_URL: string;
             FIREBASE_PRIVATE_KEY_ID: string;
 
+            JWt_BACK_SECRET: string;
+
             NODE_ENV: 'development' | 'production';
         }
     }
