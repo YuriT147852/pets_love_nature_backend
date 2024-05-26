@@ -5,6 +5,8 @@ import ProductModel from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
 import { ICreateProduct } from '@/types/product';
 
+
+// 不加篩選
 export const getProductList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
     const result = await ProductSpecModel.find({}).populate({
         path: 'productId',
@@ -20,7 +22,6 @@ export const getProductList: RequestHandler = handleErrorAsync(async (_req, res,
             data: result,
         }),
     );
-
 });
 
 export const getProductById: RequestHandler = handleErrorAsync(async (req, res, next) => {
@@ -43,7 +44,6 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
         }),
     );
 });
-
 
 export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     // 1.先建立商品訊息
@@ -81,6 +81,93 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
         res.status(200).json(
             successResponse({
                 message: '成功建立商品ID: ' + productId + ' 成功建立 ' + totalResProductSpec + ' 商品規格'
+            }),
+        );
+    }
+});
+
+// 加篩選
+export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { page, searchText, filterStatus } = req.query;
+    if (!page) {
+        next(errorResponse(404, 'page 為必填'));
+        return;
+    }
+
+    // 每頁5筆
+    const pageSize = 5;
+    // 大小排序
+    const filter = filterStatus == '1' ? 1 : -1;
+    const skip = (Number(page) - 1) * pageSize;
+
+    // 獲取總頁數
+    const totalDocuments = await ProductSpecModel.countDocuments();
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
+    //不需要文字搜
+    if (!searchText) {
+        const result = await ProductSpecModel.find({}).populate({
+            path: 'productId',
+            select: 'title subtitle description star category otherInfo imageGallery'
+        })
+            .sort({ price: filter })
+            .skip(skip)
+            .limit(pageSize);
+
+        if (result.length === 0) {
+            next(errorResponse(404, '無商品資料'));
+            return;
+        }
+        const resData = {
+            content: result,
+            page: {
+                nowPage: page,
+                totalPages
+            }
+        }
+        res.status(200).json(
+            successResponse({
+                message: '取得商品資料成功',
+                data: resData,
+            }),
+        );
+    } else {
+        // 有關鍵字
+        const text: string = searchText as string;
+        // 模糊搜尋
+        const regex = new RegExp(text);
+        const filterRegex = { $regex: regex };
+        // 先以商品資訊找關鍵字
+        const filterTitleResult = await ProductModel.find({ title: filterRegex });
+        const formatResult = filterTitleResult.map(item => ({ productId: item['_id'] }));
+
+        const totalDocuments = await ProductSpecModel.find(
+            { $or: formatResult },
+            { _id: true }
+        ).countDocuments();
+
+        const totalPages = Math.ceil(totalDocuments / pageSize);
+        const productSpecResult = await ProductSpecModel.find({ $or: formatResult }, { _id: true })
+            .populate({ path: 'productId', select: 'title' })
+            .sort({ price: filter })
+            .skip(skip)
+            .limit(pageSize);
+
+        if (productSpecResult.length === 0) {
+            next(errorResponse(404, '無商品資料'));
+            return;
+        }
+        const resData = {
+            content: productSpecResult,
+            page: {
+                nowPage: page,
+                totalPages
+            }
+        }
+        res.status(200).json(
+            successResponse({
+                message: '取得商品資料成功，關鍵字搜尋：' + text,
+                data: resData,
             }),
         );
     }

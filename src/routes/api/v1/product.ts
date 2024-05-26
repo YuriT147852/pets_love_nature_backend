@@ -21,6 +21,25 @@ router.get(
 
 router.get(
     /**
+     * #swagger.description  = "取得篩選條件商品列表"
+     * #swagger.parameters['searchText'] = { description: '關鍵字' }
+     * #swagger.parameters['filterStatus'] = { description: '依商品金額排序' }
+     * #swagger.parameters['page'] = { description: '頁數' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "result": [
+                    { $ref: '#/definitions/ProductResponses' }
+                ]
+            }
+        }
+     */
+    '/getFilterProductList',
+    ProductController.getFilterProductList
+);
+
+router.get(
+    /**
      * #swagger.description  = "取得單一商品詳細資料"
      * #swagger.parameters['id'] = { description: '商品ID.' }
      * #swagger.responses[200] = {
