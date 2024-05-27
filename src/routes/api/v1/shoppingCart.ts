@@ -91,6 +91,31 @@ router.post(
 )
 
 router.delete(
+    /**
+     * #swagger.description  = "刪除單筆購物車資訊"
+     * #swagger.parameters['body'] = {
+         in: "body",
+        required: true,
+        schema: {
+            {
+                "customerId": "664e06e7f252412155131293",
+                "productSpec": "663f18d3fc11d10c288dc062"
+            }
+        }
+    };
+    * #swagger.responses[200] = {
+        schema: {
+        message: "成功",
+        data: "刪除成功"
+        }
+    };  
+    * #swagger.responses[404] = {
+                schema: {
+                "status": false,
+                "message": "欄位錯誤",
+            }
+        }
+     */
     "",
     CartController.deleteCart
 )
