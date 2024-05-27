@@ -46,4 +46,4 @@ const productSpecSchema = new Schema<IProductSpec>(
   }
 );
 
-export default model('productSpec', productSpecSchema);
+export default model<IProductSpec>('productSpec', productSpecSchema);

@@ -7,6 +7,10 @@ interface DeliveryAddress {
     address: string;
 }
 
+interface Customer extends Document {
+    email: string;
+}
+
 interface OrderProduct {
     productId: Schema.Types.ObjectId;
     price: number;
@@ -14,7 +18,7 @@ interface OrderProduct {
 }
 
 interface Order extends Document {
-    userId: Schema.Types.ObjectId;
+    userId: Customer;
     orderProductList: OrderProduct[];
     orderDate: Date;
     orderStatus: number;
@@ -49,7 +53,7 @@ const orderProductSchema = new Schema<OrderProduct>(
 
 const orderSchema = new Schema<Order>(
     {
-        userId: { type: Schema.Types.ObjectId, required: [true, '消費者ID未填寫'] },
+        userId: { type: Schema.Types.ObjectId, required: [true, '消費者ID未填寫'], ref: 'Customer' },
         orderProductList: { type: [orderProductSchema], required: [true, '購買商品清單未填寫'] },
         orderDate: { type: Date, default: Date.now },
         orderStatus: { type: Number, required: [true, '訂單狀態未填寫'], enum: [1, 2, 3, 4, 5, -1, -2] },
