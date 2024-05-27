@@ -24,7 +24,7 @@ router.get(
      * #swagger.description  = "取得篩選條件商品列表"
      * #swagger.parameters['searchText'] = { description: '關鍵字' }
      * #swagger.parameters['filterStatus'] = { description: '依商品金額排序' }
-     * #swagger.parameters['page'] = { description: '頁數' }
+     * #swagger.parameters['page'] = { description: '前往第幾頁' }
      * #swagger.responses[200] = {
             schema: {
                 "status": true,

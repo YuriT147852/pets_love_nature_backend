@@ -148,7 +148,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
         const totalPages = Math.ceil(totalDocuments / pageSize);
         const productSpecResult = await ProductSpecModel.find({ $or: formatResult }, { _id: true })
-            .populate({ path: 'productId', select: 'title' })
+            .populate({ path: 'productId', select: 'title subtitle description star category otherInfo imageGallery' })
             .sort({ price: filter })
             .skip(skip)
             .limit(pageSize);
