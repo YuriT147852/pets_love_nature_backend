@@ -18,30 +18,6 @@ router.get(
                         "email": "zhengshi@example.com",
                         "orderStatus": -1
                     },
-                    {
-                        "_id": "663f2c28c52d18d64cdb4570",
-                        "userId": "663f12237a6dabc6203875f4",
-                        "email": "d22495521@gmail.com",
-                        "orderStatus": 1
-                    },
-                    {
-                        "_id": "6650489459f8875a5907eaf4",
-                        "userId": "6649fb0de0b4e28164a7f81c",
-                        "email": "s9654003@gmail.com",
-                        "orderStatus": 1
-                    },
-                    {
-                        "_id": "6650489459f8875a5907eaf6",
-                        "userId": "665044dc59f8875a5907eaef",
-                        "email": "sunqi@example.com",
-                        "orderStatus": 1
-                    },
-                    {
-                        "_id": "6650489459f8875a5907eaf3",
-                        "userId": "663f12237a6dabc6203875f4",
-                        "email": "d22495521@gmail.com",
-                        "orderStatus": 1
-                    }
                 ],
                 "page": {
                     "nowPage": "1",
@@ -55,6 +31,21 @@ router.get(
     '/orders',
     Back_isAuth,
     OrderController.getOrdersByAdmin
+);
+
+router.patch(
+    /**
+     * #swagger.description  = "修改某一筆訂單"
+     * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "message" : "更新成功",
+            }
+        }
+     */
+    '/updateOrder',
+    Back_isAuth,
+    OrderController.editOrderStatus
 );
 
 export default router;

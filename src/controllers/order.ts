@@ -233,7 +233,6 @@ const { MerchantID, Version, PayGateWay, NotifyUrl, ReturnUrl } = process.env;
 export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const item = req.body as PaymentItem;
 
-    console.log(item);
     const { error } = schema.validate(item);
 
     //schema
@@ -275,6 +274,36 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
         successResponse({
             message: '成功抓取金流資訊',
             data: submitData
+        })
+    );
+});
+
+export const editOrderStatus: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { orderId, orderStatus }: { orderId: string; orderStatus: number } = req.body;
+
+    if (!orderId || !orderStatus) {
+        next(errorResponse(400, 'body參數錯誤'));
+        return;
+    }
+
+    const result = await OrderModel.findByIdAndUpdate(
+        orderId,
+        { orderStatus },
+        {
+            new: true, //返回更新
+            runValidators: true // 更新時自動驗證
+        }
+    );
+
+    if (!result) {
+        next(errorResponse(400, '找不到該id'));
+        return;
+    }
+
+    console.log(result);
+    res.status(200).json(
+        successResponse({
+            message: '更新成功'
         })
     );
 });
