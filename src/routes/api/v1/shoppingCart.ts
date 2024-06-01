@@ -45,7 +45,7 @@ router.get(
     CartController.getCartById
 );
 
-router.get(
+router.post(
     '/nologin',
     CartController.getCartNoLogin
 );
