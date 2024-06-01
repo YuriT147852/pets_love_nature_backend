@@ -16,6 +16,7 @@ declare global {
 
             GOOGLE_CLIENT_ID: string;
             GOOGLE_SECRET_KEY: string;
+            GOOGLE_CAllBACK_LOCAL: string;
             GOOGLE_CAllBACK: string;
 
             FIREBASE_TYPE: string;
