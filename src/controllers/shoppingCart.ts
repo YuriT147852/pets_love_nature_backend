@@ -39,7 +39,8 @@ export const getCartNoLogin: RequestHandler = handleErrorAsync(async (req, res, 
             path: 'productId',
             select: 'title subtitle description star category otherInfo imageGallery'
         });
-        shoppingCartArr.push(result);
+        const obj = {productSpec: result}
+        shoppingCartArr.push(obj);
     }
 
     const returnObj = {
