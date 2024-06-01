@@ -9,28 +9,62 @@ import CustomerModel from '@/models/customer';
 const app = express();
 
 // 底下為google第三方
-const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, GOOGLE_CAllBACK } = process.env;
-passport.use(
-    new GoogleStrategy(
-        {
-            clientID: GOOGLE_CLIENT_ID,
-            clientSecret: GOOGLE_SECRET_KEY,
-            callbackURL: GOOGLE_CAllBACK
-        },
-        (_accessToken, _refreshToken, profile, cb) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-            return cb(null, profile);
-        }
-    )
-);
+// const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, GOOGLE_CAllBACK } = process.env;
+// passport.use(
+//     new GoogleStrategy(
+//         {
+//             clientID: GOOGLE_CLIENT_ID,
+//             clientSecret: GOOGLE_SECRET_KEY,
+//             callbackURL: GOOGLE_CAllBACK
+//         },
+//         (_accessToken, _refreshToken, profile, cb) => {
+//             // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+//             return cb(null, profile);
+//         }
+//     )
+// );
+
+const { GOOGLE_CLIENT_ID, GOOGLE_SECRET_KEY, GOOGLE_CAllBACK_LOCAL, GOOGLE_CAllBACK } = process.env;
+
+// 动态设置 GoogleStrategy
+const configureGoogleStrategy = (callbackURL: string) => {
+    passport.use(
+        new GoogleStrategy(
+            {
+                clientID: GOOGLE_CLIENT_ID,
+                clientSecret: GOOGLE_SECRET_KEY,
+                callbackURL
+            },
+            (_accessToken, _refreshToken, profile, cb) => {
+                return cb(null, profile);
+            }
+        )
+    );
+};
 
 app.use(passport.initialize());
 
-export const passportGoogleScope: RequestHandler = handleErrorAsync(async (_req, _res, next) => {
+export const passportGoogleScope: RequestHandler = handleErrorAsync(async (req, _res, next) => {
+    // const callbackUrl = req.query.callbackUrl as string;
+    // console.log(req.query);
+    // if (!callbackUrl) {
+    //     next(errorResponse(400, 'Missing callback URL'));
+    //     return;
+    // }
+
+    const { env } = req.query;
+
+    if (env !== 'pro' && env !== 'dev') {
+        next(errorResponse(400, '網址參數錯誤'));
+        return;
+    }
+
+    configureGoogleStrategy(env === 'pro' ? GOOGLE_CAllBACK : GOOGLE_CAllBACK_LOCAL);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await passport.authenticate('google', {
         scope: ['email', 'profile']
-    })(_req, _res, next);
+    })(req, _res, next);
 });
 
 export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (req, res, next) => {
