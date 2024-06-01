@@ -32,6 +32,15 @@ declare global {
 
             JWt_BACK_SECRET: string;
 
+            //金流
+            MerchantID: string;
+            HASHKEY: string;
+            HASHIV: string;
+            Version: string;
+            ReturnUrl: string;
+            NotifyUrl: string;
+            PayGateWay: string;
+
             NODE_ENV: 'development' | 'production';
         }
     }

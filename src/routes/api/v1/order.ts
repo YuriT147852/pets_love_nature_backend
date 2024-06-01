@@ -72,4 +72,6 @@ router.get(
     OrderController.getOrders
 );
 
+router.post('/payment', OrderController.usePayment);
+
 export default router;
