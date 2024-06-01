@@ -250,7 +250,7 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
     const order = {
         ...item, //訂單資料
         TimeStamp, //需要一個時間戳
-        MerchantOrderNo: '444' //這個要放mongo內的訂單編號
+        MerchantOrderNo: `${TimeStamp}` //這個要放mongo內的訂單編號
     };
 
     // 進行訂單加密
