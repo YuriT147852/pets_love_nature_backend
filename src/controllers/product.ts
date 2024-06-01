@@ -205,3 +205,18 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     );
 
 });
+
+export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const result = await ProductSpecModel.findByIdAndRemove(req.params.id);
+    if (!result) {
+        next(errorResponse(404, '商品規格不存在'));
+        return;
+    }
+    console.log("deleteProductSpecById result", result);
+
+    res.status(200).json(
+        successResponse({
+            message: '刪除商品規格成功'
+        }),
+    );
+});

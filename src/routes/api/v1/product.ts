@@ -8,7 +8,7 @@ router.get(
      * #swagger.description  = "取得商品列表"
      * #swagger.responses[200] = {
             schema: {
-                "status": true,
+                "status": "true",
                 "result": [
                     { $ref: '#/definitions/ProductResponses' }
                 ]
@@ -29,7 +29,7 @@ router.get(
      * #swagger.parameters['limit'] = { description: '顯示筆數' }
      * #swagger.responses[200] = {
             schema: {
-                "status": true,
+                "status": "true",
                 "result": [
                     { $ref: '#/definitions/ProductResponses' }
                 ],
@@ -50,14 +50,14 @@ router.get(
      * #swagger.parameters['id'] = { description: '商品ID.' }
      * #swagger.responses[200] = {
             schema: {
-                "status": true,
+                "status": "true",
                 "result": { $ref: '#/definitions/ProductResponses' }
             }
         }
      * #swagger.responses[404] = {
             schema: {
-                "status": false,
-                "message": "此房型不存在",
+                "status": "false",
+                "message": "此商品存在",
             }
         }
      */
