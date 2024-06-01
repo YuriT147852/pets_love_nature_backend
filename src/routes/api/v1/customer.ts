@@ -12,8 +12,8 @@ router.post(
      * #swagger.responses[200] = {
             schema: {
                 id: "663b9423ba76f3d8944cda27",
-                message: "登入成功,
-                "status": true,
+                message: "登入成功",
+                "status": "true",
                 "token": "eyJhbGciOiJI....",
             }
         }
@@ -89,7 +89,7 @@ router.put(
         }
      * #swagger.responses[404] = {
             schema: {
-                "status": false,
+                "status": "false",
                 "message": "此消費者不存在",
             }
         }

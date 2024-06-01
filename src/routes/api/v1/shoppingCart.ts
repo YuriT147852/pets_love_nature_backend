@@ -81,7 +81,7 @@ router.post(
     };
     * #swagger.responses[404] = {
                 schema: {
-                "status": false,
+                "status": "false",
                 "message": "欄位錯誤",
             }
         }
@@ -111,7 +111,7 @@ router.delete(
     };  
     * #swagger.responses[404] = {
                 schema: {
-                "status": false,
+                "status": "false",
                 "message": "欄位錯誤",
             }
         }

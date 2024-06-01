@@ -10,7 +10,7 @@ export const isAuth: RequestHandler = async (req, _res, next) => {
      * #swagger.responses[403] = {
             description: '重新登入',
             schema: {
-                "status": false,
+                "status": "false",
                 "message": "請重新登入",
             }
         }

@@ -80,7 +80,7 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                 }
             }
 
-            if(!findStatus) {
+            if (!findStatus) {
                 const targetDetail = shoppingCart[0];
                 const obj = {
                     isChoosed: false,

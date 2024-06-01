@@ -11,7 +11,7 @@
 //      * #swagger.responses[200] = {
 //             description: '登入成功',
 //             schema: {
-//                 "status": true,
+//                 "status": "true",
 //                 "token": "eyJhbGciOiJI....",
 //                 "result": {
 //                     "name": "Lori Murphy",
@@ -35,7 +35,7 @@
 //             schema: {
 //                 id: "663b9423ba76f3d8944cda27",
 //                 message: "登入成功,
-//                 "status": true,
+//                 "status": "true",
 //                 "token": "eyJhbGciOiJI....",
 //             }
 //         }

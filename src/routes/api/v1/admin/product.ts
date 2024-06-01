@@ -8,7 +8,7 @@ router.get(
      * #swagger.description  = "取得商品列表"
      * #swagger.responses[200] = {
             schema: {
-                "status": true,
+                "status": "true",
                 "result": [
                     { $ref: '#/definitions/ProductResponses' }
                 ]
@@ -25,14 +25,14 @@ router.get(
      * #swagger.parameters['id'] = { description: '商品ID.' }
      * #swagger.responses[200] = {
             schema: {
-                "status": true,
+                "status": "true",
                 "result": { $ref: '#/definitions/ProductResponses' }
             }
         }
      * #swagger.responses[404] = {
             schema: {
-                "status": false,
-                "message": "此房型不存在",
+                "status": "false",
+                "message": "此商品不存在",
             }
         }
      */
@@ -62,19 +62,46 @@ router.post(
                         "price": 180,
                         "inStock": 50,
                     }
-                ]
-            }
+                ],
+                "imageGallery": 
+                        [
+                            {
+                                "imgUrl": "https://images.unsplash.com/photo-1597843786411-a7fa8ad44a95?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                                "altText": "狗鮮食"
+                            }
+                        ],
+                    }
         }
         
      * #swagger.responses[404] = {
             schema:             {
-                "status": false,
+                "status": "false",
                 "message": "欄位錯誤",
             }
         }
      */
     '',
     ProductController.createOneOrder
+);
+
+router.delete(
+    /**
+     * #swagger.description  = "刪除商品規格" 
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "message": "刪除商品規格成功",
+            }
+        }
+     * #swagger.responses[404] = {
+            schema: {
+                status": "false",
+                "message": "商品規格不存在",
+            }
+        }
+     */
+    '/:id',
+    ProductController.deleteProductSpecById
 );
 
 export default router;
