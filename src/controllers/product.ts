@@ -4,6 +4,16 @@ import { successResponse } from '@/utils/successHandler';
 import ProductModel from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
 import { ICreateProduct } from '@/types/product';
+import { PipelineStage } from 'mongoose';
+
+interface MatchStage {
+    [key: string]: {
+        $regex?: RegExp;
+        [key: string]: unknown;
+    };
+}
+
+type SortOrder = 1 | -1;
 
 
 // 不加篩選
@@ -87,88 +97,111 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
 });
 
 // 加篩選
-export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { page, searchText, filterStatus } = req.query;
-    if (!page) {
-        next(errorResponse(404, 'page 為必填'));
-        return;
-    }
+export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit } = req.query;
 
-    // 每頁5筆
-    const pageSize = 5;
-    // 大小排序
-    const filter = filterStatus == '1' ? 1 : -1;
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
+    // 跳頁
     const skip = (Number(page) - 1) * pageSize;
-
-    // 獲取總頁數
+    // 獲取總筆數
     const totalDocuments = await ProductSpecModel.countDocuments();
+    // 獲取總頁數
     const totalPages = Math.ceil(totalDocuments / pageSize);
 
-    //不需要文字搜
-    if (!searchText) {
-        const result = await ProductSpecModel.find({}).populate({
-            path: 'productId',
-            select: 'title subtitle description star category otherInfo imageGallery'
-        })
-            .sort({ price: filter })
-            .skip(skip)
-            .limit(pageSize);
+    // 排序
+    const sortOrderNumber: SortOrder = sortOrder === -1 ? -1 : 1;
+    // 依照傳入的變數置換排序項目
+    let sortField: Record<string, SortOrder> = {};
+    switch (sortBy) {
+        case 'star':
+            sortField = { 'products.star': sortOrderNumber };
+            break;
+        case 'price':
+            sortField = { 'price': sortOrderNumber };
+            break;
+        case 'updatedAt':
+            sortField = { 'updatedAt': sortOrderNumber };
+            break;
+        case 'productSalesQuantity':
+            // todo: 計算訂單內的商品銷售數量
+            // sortField = { 'updatedAt': sortOrderNumber };
+            break;
+        default:
+            sortField = { 'inStock': sortOrderNumber };
+    }
 
-        if (result.length === 0) {
-            next(errorResponse(404, '無商品資料'));
-            return;
-        }
-        const resData = {
-            content: result,
-            page: {
-                nowPage: page,
-                totalPages
+    // 關鍵字搜尋
+    const matchStage: MatchStage = {};
+    if (searchText) {
+        const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
+        matchStage['products.title'] = { $regex: regex };
+    }
+
+    const aggregationPipeline: PipelineStage[] = [
+        // 組裝商品資訊
+        {
+            $lookup: {
+                from: 'products',            // 目标集合名
+                localField: 'productId',     // 本集合中用于匹配的字段
+                foreignField: '_id',         // 目标集合中用于匹配的字段
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0, // 排除_id字段
+                        }
+                    }
+                ],
+                as: 'product'               // 輸出名稱
+            }
+        },
+        {
+            $unwind: '$product'            // 展開成物件
+        },
+        {
+            $project: {
+                productId: 0, // 排除 productId
             }
         }
+    ];
+    // 如果有關鍵字 添加 $match
+    if (Object.keys(matchStage).length > 0) {
+        aggregationPipeline.push({ $match: matchStage });
+    }
+
+    // 加入排序及分頁
+    aggregationPipeline.push(
+        { $sort: sortField },
+        { $skip: skip },                   // 跳過指定數量
+        { $limit: pageSize }               // 限制輸出數量
+    );
+
+    const result = await ProductSpecModel.aggregate(aggregationPipeline);
+    console.log("result", result);
+
+    if (result.length === 0) {
         res.status(200).json(
             successResponse({
-                message: '取得商品資料成功',
-                data: resData,
-            }),
-        );
-    } else {
-        // 有關鍵字
-        const text: string = searchText as string;
-        // 模糊搜尋
-        const regex = new RegExp(text);
-        const filterRegex = { $regex: regex };
-        // 先以商品資訊找關鍵字
-        const filterTitleResult = await ProductModel.find({ title: filterRegex });
-        const formatResult = filterTitleResult.map(item => ({ productId: item['_id'] }));
-
-        const totalDocuments = await ProductSpecModel.find(
-            { $or: formatResult },
-            { _id: true }
-        ).countDocuments();
-
-        const totalPages = Math.ceil(totalDocuments / pageSize);
-        const productSpecResult = await ProductSpecModel.find({ $or: formatResult }, { _id: true })
-            .populate({ path: 'productId', select: 'title subtitle description star category otherInfo imageGallery' })
-            .sort({ price: filter })
-            .skip(skip)
-            .limit(pageSize);
-
-        if (productSpecResult.length === 0) {
-            next(errorResponse(404, '無商品資料'));
-            return;
-        }
-        const resData = {
-            content: productSpecResult,
-            page: {
-                nowPage: page,
-                totalPages
-            }
-        }
-        res.status(200).json(
-            successResponse({
-                message: '取得商品資料成功，關鍵字搜尋：' + text,
-                data: resData,
+                message: '無商品資料',
+                data: [],
             }),
         );
     }
+
+    const resData = {
+        content: result,
+        page: {
+            // todo: 一直顯示所有商品數量
+            // totalAmount: totalDocuments,
+            nowPage: Number(page),
+            totalPages
+        }
+    }
+    res.status(200).json(
+        successResponse({
+            message: '取得商品資料成功',
+            data: resData,
+        }),
+    );
+
 });

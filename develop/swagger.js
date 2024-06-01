@@ -26,19 +26,19 @@ const doc = {
             onlineStatus: false,
             onlineDate: '',
             product: {
-                _id: '661a9a9fa892ea2a833a1009',
                 title: '鮮嫩雞胸肉鮮食罐頭',
                 subtitle: '新鮮雞胸肉，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素。',
-                description: '...',
                 category: ['fresh', 'dog'],
                 otherInfo: [{ infoName: '產地', infoValue: '台灣' }],
-                star: 0,
+                star: 4,
                 imageGallery: [
                     {
                         imgUrl: 'https://images.unsplash.com/photo-1597843786411-a7fa8ad44a95?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                         altText: '狗鮮食'
                     }
-                ]
+                ],
+                createdAt: '2024-05-21T12:17:20.660Z',
+                updatedAt: '2024-05-21T12:17:20.660Z'
             }
         }
     }

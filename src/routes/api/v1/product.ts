@@ -23,14 +23,20 @@ router.get(
     /**
      * #swagger.description  = "取得篩選條件商品列表"
      * #swagger.parameters['searchText'] = { description: '關鍵字' }
-     * #swagger.parameters['filterStatus'] = { description: '依商品金額排序' }
-     * #swagger.parameters['page'] = { description: '前往第幾頁' }
+     * #swagger.parameters['sortOrder'] = { description: '選擇排序方式，預設-1；-1 由大到小 / 1 由小到大' }
+     * #swagger.parameters['sortBy'] = { description: '以指定項目排序，預設評價；評價：star，價格：price，更新時間：updatedAt' }
+     * #swagger.parameters['page'] = { description: '前往指定頁數' }
+     * #swagger.parameters['limit'] = { description: '顯示筆數' }
      * #swagger.responses[200] = {
             schema: {
                 "status": true,
                 "result": [
                     { $ref: '#/definitions/ProductResponses' }
-                ]
+                ],
+                "page": {
+                    "nowPage": 1,
+                    "totalPages": 10
+                }
             }
         }
      */
