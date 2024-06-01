@@ -34,15 +34,19 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
 export const getCartNoLogin: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const shoppingCartArr = [];
     for (let i = 0; i < req.body.shoppingCart.length; i++) {
-        const result = await ProductSpecModel.findById(req.body.shoppingCart[i].productSpec).populate({
+        const focusSpec = req.body.shoppingCart[i];
+        const result = await ProductSpecModel.findById(focusSpec.productSpec).populate({
             path: 'productId',
             select: 'title subtitle description star category otherInfo imageGallery'
         });
-        const obj = {
-            productSpec: result,
-            quantity: req.body.shoppingCart[i].quantity
-        };
-        shoppingCartArr.push(obj);
+        if(result?.inStock) {
+            const obj = {
+                productSpec: result,
+                quantity: focusSpec.quantity > result?.inStock ? result?.inStock : focusSpec.quantity
+            };
+            shoppingCartArr.push(obj);
+        }
+
     }
 
     const returnObj = {
