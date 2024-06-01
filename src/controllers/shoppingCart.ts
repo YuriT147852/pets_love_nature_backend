@@ -3,9 +3,9 @@ import type { RequestHandler } from 'express';
 import shoppingCartModel from '@/models/shoppingCart';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
+import ProductSpecModel from '@/models/productSpec';
 
 export const getCartById: RequestHandler = handleErrorAsync(async (req, res, next) => {
-
     const result = await shoppingCartModel
         .findOne({
             customerId: req.params.id
@@ -31,13 +31,34 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
     );
 });
 
-export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const getCartNoLogin: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+    const shoppingCartArr = [];
 
+    for (let i = 0; i < req.body.shoppingCart.length; i++) {
+        const result = await ProductSpecModel.findById(req.body.shoppingCart[i].productSpec).populate({
+            path: 'productId',
+            select: 'title subtitle description star category otherInfo imageGallery'
+        });
+        shoppingCartArr.push(result);
+    }
+
+    const returnObj = {
+        shoppingCart: shoppingCartArr
+    };
+
+    res.status(200).json(
+        successResponse({
+            message: '成功',
+            data: returnObj
+        })
+    );
+});
+
+export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const { customerId, shoppingCart, addWay } = req.body;
     const customerData = await shoppingCartModel.findOne({
         customerId: customerId
     });
-
 
     // 如果購物車資料庫沒有該使用者
     if (!customerData) {
@@ -86,8 +107,8 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                     isChoosed: false,
                     productSpec: targetDetail.productSpec,
                     quantity: targetDetail.quantity
-                }
-                customerData.shoppingCart.push(obj)
+                };
+                customerData.shoppingCart.push(obj);
             }
         }
         await customerData.save(); // 更新
@@ -102,7 +123,6 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
 });
 
 export const deleteCart: RequestHandler = handleErrorAsync(async (req, res, next) => {
-
     const { customerId, productSpec } = req.body;
     const customerData = await shoppingCartModel.findOne({
         customerId: customerId

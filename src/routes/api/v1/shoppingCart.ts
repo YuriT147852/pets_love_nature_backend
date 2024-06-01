@@ -41,8 +41,13 @@ router.get(
         }
     }
  */
-    '/:id',
+    '/login/:id',
     CartController.getCartById
+);
+
+router.get(
+    '/nologin',
+    CartController.getCartNoLogin
 );
 
 router.post(
