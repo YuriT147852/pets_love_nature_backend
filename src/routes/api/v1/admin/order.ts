@@ -7,6 +7,11 @@ const router = Router();
 router.get(
     /**
      * #swagger.description  = "取得訂單清單"
+     * #swagger.parameters['page'] = { description: '頁數', required: true,}
+     * #swagger.parameters['filterStatus'] = { description: '物流排序 1:小到大 / 0:大到小' }
+     * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
+     * #swagger.parameters['requestSame'] = { description: '完全一致  0:false/1:true' }
+     * #swagger.parameters['searchType'] = { description: '文字搜尋種類 email,orderNum' }
      * #swagger.responses[200] = {
             schema: {
                 "status": "success",
@@ -36,6 +41,10 @@ router.get(
 router.patch(
     /**
      * #swagger.description  = "修改某一筆訂單"
+    * #swagger.parameters['body'] = {
+        in: "body",
+        required: true,
+    };
      * #swagger.responses[200] = {
             schema: {
                 "status": true,
