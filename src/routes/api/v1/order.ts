@@ -72,6 +72,23 @@ router.get(
     OrderController.getOrders
 );
 
-router.post('/payment', OrderController.usePayment);
+router.post(
+    /**
+    * #swagger.description  = "新增結帳(連上第三方支付API)"
+    * #swagger.tags = ['order - 消費者']
+    * #swagger.parameters['body'] = {
+        in: "body",
+        required: true,
+        schema: {
+            "Email":"123@google.com",
+            "Amt":10,
+            "ItemDesc":"這是商品描述"
+        }
+    };
+     */
+    '/payment',
+    isAuth,
+    OrderController.usePayment
+);
 
 export default router;
