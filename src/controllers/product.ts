@@ -115,7 +115,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     let sortField: Record<string, SortOrder> = {};
     switch (sortBy) {
         case 'star':
-            sortField = { 'products.star': sortOrderNumber };
+            sortField = { 'product.star': sortOrderNumber };
             break;
         case 'price':
             sortField = { 'price': sortOrderNumber };
@@ -135,7 +135,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     const matchStage: MatchStage = {};
     if (searchText) {
         const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
-        matchStage['products.title'] = { $regex: regex };
+        matchStage['product.title'] = { $regex: regex };
     }
 
     const aggregationPipeline: PipelineStage[] = [
@@ -177,7 +177,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     );
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-    console.log("result", result);
 
     if (result.length === 0) {
         res.status(200).json(
@@ -212,7 +211,6 @@ export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req
         next(errorResponse(404, '商品規格不存在'));
         return;
     }
-    console.log("deleteProductSpecById result", result);
 
     res.status(200).json(
         successResponse({
