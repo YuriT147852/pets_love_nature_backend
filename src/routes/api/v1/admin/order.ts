@@ -41,13 +41,10 @@ router.get(
 router.patch(
     /**
      * #swagger.description  = "修改某一筆訂單"
-<<<<<<< HEAD
-=======
     * #swagger.parameters['body'] = {
         in: "body",
         required: true,
     };
->>>>>>> main
      * #swagger.responses[200] = {
             schema: {
                 "status": true,
