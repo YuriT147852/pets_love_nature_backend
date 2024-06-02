@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as CartController from '@/controllers/shoppingCart';
+import { isAuth } from '@/utils/isAuth';
 
 const router = Router();
 
@@ -42,6 +43,7 @@ router.get(
     }
  */
     '/login/:id',
+    isAuth,
     CartController.getCartById
 );
 
@@ -92,6 +94,7 @@ router.post(
         }
      */
     "",
+    isAuth,
     CartController.addCart
 )
 
@@ -122,6 +125,7 @@ router.delete(
         }
      */
     "",
+    isAuth,
     CartController.deleteCart
 )
 
