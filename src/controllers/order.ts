@@ -307,3 +307,23 @@ export const editOrderStatus: RequestHandler = handleErrorAsync(async (req, res,
         })
     );
 });
+
+export const getOrderById: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { orderID } = req.params;
+
+    const result = await OrderModel.find({
+        _id: orderID
+    }).populate({ path: 'userId', select: 'email' });
+
+    if (!result) {
+        next(errorResponse(404, '無訂單資料'));
+        return;
+    }
+
+    res.status(200).json(
+        successResponse({
+            message: '取得消費者訂單成功',
+            data: result
+        })
+    );
+});
