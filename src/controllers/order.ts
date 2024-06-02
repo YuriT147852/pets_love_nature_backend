@@ -307,6 +307,7 @@ export const editOrderStatus: RequestHandler = handleErrorAsync(async (req, res,
         })
     );
 });
+<<<<<<< HEAD
 
 export const getOrderById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const { orderID } = req.params;
@@ -327,3 +328,5 @@ export const getOrderById: RequestHandler = handleErrorAsync(async (req, res, ne
         })
     );
 });
+=======
+>>>>>>> main
