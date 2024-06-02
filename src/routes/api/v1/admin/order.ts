@@ -98,6 +98,7 @@ router.get(
         }
      */
     '/order/:orderID',
+    Back_isAuth,
     OrderController.getOrderById
 );
 
