@@ -57,7 +57,6 @@ router.patch(
     OrderController.editOrderStatus
 );
 
-<<<<<<< HEAD
 router.get(
     /**
      * #swagger.description  = "取得訂單清單"
@@ -102,6 +101,4 @@ router.get(
     OrderController.getOrderById
 );
 
-=======
->>>>>>> main
 export default router;
