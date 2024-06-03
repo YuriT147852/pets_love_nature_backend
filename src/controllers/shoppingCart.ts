@@ -104,7 +104,6 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
     });
 
     let checkedInStock;
-
     // 如果購物車資料庫沒有該使用者
     if (!customerData) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-floating-promises
@@ -146,9 +145,8 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                     }
                 }
             }
-
             if (!findStatus) {
-                const targetDetail = shoppingCart[0];
+                const targetDetail = shoppingCart[i];
                 const obj = {
                     isChoosed: false,
                     productSpec: targetDetail.productSpec,
