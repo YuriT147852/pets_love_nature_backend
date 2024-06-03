@@ -49,7 +49,7 @@ router.get(
 
 router.post(
     /**
-     * #swagger.description  = "新增單筆購物車"
+     * #swagger.description  = "未登入取得購物車資訊"
      * #swagger.parameters['body'] = {  
          in: "body",
         required: true,
@@ -126,7 +126,7 @@ router.post(
 
 router.post(
     /**
-     * #swagger.description  = "新增單筆購物車"
+     * #swagger.description  = "新增商品至購物車"
      * #swagger.parameters['body'] = {  
          in: "body",
         required: true,
