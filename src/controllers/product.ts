@@ -98,7 +98,7 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
 
 // 加篩選
 export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
-    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit } = req.query;
+    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory } = req.query;
 
     // 默認 1 頁顯示 10 筆
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
@@ -131,13 +131,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             sortField = { 'inStock': sortOrderNumber };
     }
 
-    // 關鍵字搜尋
-    const matchStage: MatchStage = {};
-    if (searchText) {
-        const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
-        matchStage['product.title'] = { $regex: regex };
-    }
-
     const aggregationPipeline: PipelineStage[] = [
         // 組裝商品資訊
         {
@@ -164,7 +157,19 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             }
         }
     ];
-    // 如果有關鍵字 添加 $match
+
+    // 創建一個空的 matchStage 物件
+    const matchStage: MatchStage = {};
+    // 如果有關鍵字，則設置匹配條件
+    if (searchText) {
+        const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
+        matchStage['product.title'] = { $regex: regex };
+    }
+    // 如果有分類，則也加入匹配條件
+    if (filterCategory) {
+        matchStage['product.category'] = { $in: [filterCategory] };
+    }
+    // 如果 matchStage 不是空對象，則添加 $match 階段
     if (Object.keys(matchStage).length > 0) {
         aggregationPipeline.push({ $match: matchStage });
     }
@@ -177,7 +182,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     );
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
@@ -186,7 +190,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             }),
         );
     }
-
     const resData = {
         content: result,
         page: {
