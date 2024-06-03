@@ -1,9 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { RequestHandler } from 'express';
-import shoppingCartModel from '@/models/shoppingCart';
+import shoppingCartModel, { IAddShoppingCart } from '@/models/shoppingCart';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductSpecModel from '@/models/productSpec';
+
+// 用於檢查商品庫存數量和購物車數量
+const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
+    const tempArr = [];
+    for (let i = 0; i < productSpecArr.length; i++) {
+        const focusSpec = productSpecArr[i].productSpec;
+        const focusQuantity = productSpecArr[i].quantity;
+        const result = await ProductSpecModel.findById(focusSpec).populate({
+            path: 'productId',
+            select: 'title subtitle description star category otherInfo imageGallery'
+        });
+
+        if (result?.inStock) {
+            if (focusQuantity > result?.inStock) {
+                // 如果數量大於instock
+                const obj = {
+                    productSpec: focusSpec,
+                    quantity: result?.inStock,
+                    message: '購物車數量大於庫存數量，已調整為庫存數量',
+                    status: 1 // 0為正常 1為超過
+                };
+
+                tempArr.push(obj);
+            } else {
+                // 如果數量沒有大於instock
+                const obj = {
+                    productSpec: focusSpec,
+                    quantity: focusQuantity,
+                    message: '',
+                    status: 0 // 0為正常 1為超過
+                };
+                tempArr.push(obj);
+            }
+        }
+    }
+    return tempArr;
+};
 
 export const getCartById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await shoppingCartModel
@@ -39,14 +76,13 @@ export const getCartNoLogin: RequestHandler = handleErrorAsync(async (req, res, 
             path: 'productId',
             select: 'title subtitle description star category otherInfo imageGallery'
         });
-        if(result?.inStock) {
+        if (result?.inStock) {
             const obj = {
                 productSpec: result,
                 quantity: focusSpec.quantity > result?.inStock ? result?.inStock : focusSpec.quantity
             };
             shoppingCartArr.push(obj);
         }
-
     }
 
     const returnObj = {
@@ -67,8 +103,12 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
         customerId: customerId
     });
 
+    let checkedInStock;
     // 如果購物車資料庫沒有該使用者
     if (!customerData) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-floating-promises
+        checkedInStock = await checkInStock(shoppingCart);
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         const addIsChoosedCart = shoppingCart.map((eachCart: object) => {
             const obj: object = {
@@ -78,20 +118,18 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
             return obj;
         });
 
-        const addCartFu = await shoppingCartModel.create({
+        await shoppingCartModel.create({
             customerId,
             shoppingCart: addIsChoosedCart
         });
-
         res.status(200).json(
             successResponse({
                 message: '成功',
-                data: addCartFu
+                data: checkedInStock
             })
         );
     } else {
         // 如果有該使用者，則更新購物車
-
         for (let i = 0; i < shoppingCart.length; i++) {
             let findStatus = false;
             for (let j = 0; j < customerData.shoppingCart.length; j++) {
@@ -107,9 +145,8 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                     }
                 }
             }
-
             if (!findStatus) {
-                const targetDetail = shoppingCart[0];
+                const targetDetail = shoppingCart[i];
                 const obj = {
                     isChoosed: false,
                     productSpec: targetDetail.productSpec,
@@ -118,12 +155,26 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                 customerData.shoppingCart.push(obj);
             }
         }
+        const tempCart = customerData.shoppingCart.map(eachCart => {
+            const obj = {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                productSpec: eachCart.productSpec.toString(),
+                quantity: eachCart.quantity
+            };
+            return obj;
+        });
+
+        checkedInStock = await checkInStock(tempCart);
+        for (let i = 0; i < customerData.shoppingCart.length; i++) {
+            customerData.shoppingCart[i].quantity = checkedInStock[i].quantity;
+        }
+
         await customerData.save(); // 更新
 
         res.status(200).json(
             successResponse({
                 message: '成功',
-                data: customerData.shoppingCart
+                data: checkedInStock
             })
         );
     }

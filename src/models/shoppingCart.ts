@@ -6,6 +6,11 @@ export interface IShoppingCart extends Document {
   shoppingCart: Array<IProductInCart>
 }
 
+export interface IAddShoppingCart {
+  productSpec: string,
+  quantity: number
+}
+
 interface IProductInCart {
   // productId: Schema.Types.ObjectId;
   productSpec: Schema.Types.ObjectId;
