@@ -16,6 +16,8 @@ const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
             select: 'title subtitle description star category otherInfo imageGallery'
         });
 
+        console.log('result.productId.title', result?.productId.title);
+
         if (result?.inStock) {
             if (focusQuantity > result?.inStock) {
                 // 如果數量大於instock

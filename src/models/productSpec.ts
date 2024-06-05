@@ -1,13 +1,24 @@
 import { Schema, model, type Document } from 'mongoose';
 
 export interface IProductSpec extends Document {
-  productId: Schema.Types.ObjectId;
+  productId: Schema.Types.ObjectId | ITransformProductId;
   productNumber: string;
   weight: number;
   price: number;
   inStock: number;
   onlineStatus: boolean;
   onlineDate: Date;
+}
+
+export interface ITransformProductId extends Document{
+  _id: Schema.Types.ObjectId,
+  title: string,
+  subtitle: string,
+  description: string,
+  category: Array<string>,
+  otherInfo: Array<object>,
+  star: number,
+  imageGallery: Array<object>
 }
 
 const productSpecSchema = new Schema<IProductSpec>(

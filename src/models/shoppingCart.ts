@@ -7,13 +7,34 @@ export interface IShoppingCart extends Document {
 }
 
 export interface IAddShoppingCart {
-  productSpec: string,
+  productSpec: string | ITempProductSpecId,
   quantity: number
+}
+
+export interface ITransformProductId extends Document{
+    _id: Schema.Types.ObjectId,
+    title: string,
+    subtitle: string,
+    description: string,
+    category: Array<string>,
+    otherInfo: Array<object>,
+    star: number,
+    imageGallery: Array<object>
+}
+
+export interface ITempProductSpecId extends Document {
+  _id: Schema.Types.ObjectId,
+  productId: Schema.Types.ObjectId | ITransformProductId,
+  productNumber: string,
+  weight: number,
+  price: number,
+  inStock: number,
+  onlineStatus: boolean,
 }
 
 interface IProductInCart {
   // productId: Schema.Types.ObjectId;
-  productSpec: Schema.Types.ObjectId;
+  productSpec: Schema.Types.ObjectId | ITempProductSpecId;
   quantity: number;
   isChoosed: boolean;
 }
