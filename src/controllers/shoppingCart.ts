@@ -4,6 +4,7 @@ import shoppingCartModel, { IAddShoppingCart } from '@/models/shoppingCart';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductSpecModel from '@/models/productSpec';
+import CustomerModel from '@/models/customer';
 
 // 用於檢查商品庫存數量和購物車數量
 const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
@@ -62,8 +63,20 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
             }
         });
     if (!result) {
-        next(errorResponse(404, '此customer id不存在'));
-        return;
+        const customer = await CustomerModel.findById(req.params.id);
+
+        if (customer) {
+            res.status(200).json(
+                successResponse({
+                    message: '取得購物車資料成功，購物車是空的',
+                    data: {
+                        shoppingCart: []
+                    }
+                })
+            );
+        } else {
+            next(errorResponse(404, '此customer id不存在'));
+        }
     }
 
     res.status(200).json(
