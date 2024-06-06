@@ -4,10 +4,13 @@ import shoppingCartModel, { IAddShoppingCart } from '@/models/shoppingCart';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductSpecModel from '@/models/productSpec';
+import CustomerModel from '@/models/customer';
 
 // 用於檢查商品庫存數量和購物車數量
 const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
     const tempArr = [];
+    let str = '成功';
+
     for (let i = 0; i < productSpecArr.length; i++) {
         const focusSpec = productSpecArr[i].productSpec;
         const focusQuantity = productSpecArr[i].quantity;
@@ -25,7 +28,7 @@ const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
                     message: '購物車數量大於庫存數量，已調整為庫存數量',
                     status: 1 // 0為正常 1為超過
                 };
-
+                str = '購物車內有商品數量大於庫存數量，已調整為庫存數量';
                 tempArr.push(obj);
             } else {
                 // 如果數量沒有大於instock
@@ -39,7 +42,11 @@ const checkInStock = async (productSpecArr: Array<IAddShoppingCart>) => {
             }
         }
     }
-    return tempArr;
+    const obj = {
+        checkedInStock: tempArr,
+        checkedString: str
+    };
+    return obj;
 };
 
 export const getCartById: RequestHandler = handleErrorAsync(async (req, res, next) => {
@@ -56,8 +63,20 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
             }
         });
     if (!result) {
-        next(errorResponse(404, '此customer id不存在'));
-        return;
+        const customer = await CustomerModel.findById(req.params.id);
+
+        if (customer) {
+            res.status(200).json(
+                successResponse({
+                    message: '取得購物車資料成功，購物車是空的',
+                    data: {
+                        shoppingCart: []
+                    }
+                })
+            );
+        } else {
+            next(errorResponse(404, '此customer id不存在'));
+        }
     }
 
     res.status(200).json(
@@ -103,11 +122,10 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
         customerId: customerId
     });
 
-    let checkedInStock;
     // 如果購物車資料庫沒有該使用者
     if (!customerData) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-floating-promises
-        checkedInStock = await checkInStock(shoppingCart);
+        const { checkedInStock, checkedString } = await checkInStock(shoppingCart);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         const addIsChoosedCart = shoppingCart.map((eachCart: object) => {
@@ -124,7 +142,7 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
         });
         res.status(200).json(
             successResponse({
-                message: '成功',
+                message: checkedString,
                 data: checkedInStock
             })
         );
@@ -164,16 +182,20 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
             return obj;
         });
 
-        checkedInStock = await checkInStock(tempCart);
+        const { checkedInStock, checkedString } = await checkInStock(tempCart);
         for (let i = 0; i < customerData.shoppingCart.length; i++) {
-            customerData.shoppingCart[i].quantity = checkedInStock[i].quantity;
+            for (let j = 0; j < checkInStock.length; j++) {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                if (checkedInStock[j].productSpec === customerData.shoppingCart[i].productSpec.toString())
+                    customerData.shoppingCart[i].quantity = checkedInStock[i].quantity;
+            }
         }
 
         await customerData.save(); // 更新
 
         res.status(200).json(
             successResponse({
-                message: '成功',
+                message: checkedString,
                 data: checkedInStock
             })
         );
