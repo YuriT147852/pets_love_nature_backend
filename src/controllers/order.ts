@@ -3,8 +3,8 @@ import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import OrderModel from '@/models/orders';
 import { successResponse } from '@/utils/successHandler';
 import CustomerModel from '@/models/customer';
-import Joi from 'joi';
 import * as payment from '@/utils/payment';
+import { PaymentItem, ResPaymentItem } from '@/types/order';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await OrderModel.find(
@@ -204,44 +204,29 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
     }
 });
 
-interface PaymentItem {
-    Email: string;
-    Amt: number; //總金額
-    ItemDesc: string; //商品描述
-    aesEncrypt?: string;
-    shaEncrypt?: string;
-}
-
-const schema = Joi.object({
-    Email: Joi.string().email().required().messages({
-        'string.base': 'Email 應該是字符串',
-        'string.email': 'Email 格式無效',
-        'any.required': 'Email 是必需的'
-    }),
-    Amt: Joi.number().required().messages({
-        'number.base': 'Amt 應該是數字',
-        'any.required': 'Amt 是必需的'
-    }),
-    ItemDesc: Joi.string().required().messages({
-        'string.base': 'ItemDesc 應該是字符串',
-        'any.required': 'ItemDesc 是必需的'
-    })
-}).options({ convert: false }); //禁用自動轉換
-
 const { MerchantID, Version, PayGateWay, NotifyUrl, ReturnUrl } = process.env;
 
 export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const item = req.body as PaymentItem;
 
-    const { error } = schema.validate(item);
+    const { Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName } = item;
 
-    //schema
-    if (error) {
-        next(errorResponse(400, 'body參數錯誤: ' + error.details.map(detail => detail.message).join(', ')));
+    if (!Email || !Amt || !ItemDesc || !userId || !orderProductList || !deliveryAddress || !deliveryUserName) {
+        next(errorResponse(400, 'body參數錯誤'));
+        return;
+    } else if (orderProductList.length === 0) {
+        next(errorResponse(400, 'orderProductList長度不能為0'));
         return;
     }
 
-    //先新增一筆訂單
+    //新增一筆訂單
+    const resultOrder = await OrderModel.create({
+        userId,
+        orderProductList,
+        deliveryAddress,
+        orderStatus: 1,
+        deliveryUserName
+    });
 
     //需要一個時間戳
     const TimeStamp = Math.round(new Date().getTime() / 1000);
@@ -249,22 +234,25 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
     const order = {
         ...item, //訂單資料
         TimeStamp, //需要一個時間戳
-        MerchantOrderNo: `${TimeStamp}` //這個要放mongo內的訂單編號
+        MerchantOrderNo: resultOrder._id //這個要放mongo內的訂單編號
     };
 
     // 進行訂單加密
-    // 加密第一段字串，此段主要是提供交易內容給予藍新金流
     const aesEncrypt = payment.createSesEncrypt(order);
 
     // 使用 HASH 再次 SHA 加密字串，作為驗證使用
     const shaEncrypt = payment.createShaEncrypt(aesEncrypt);
-    order.aesEncrypt = aesEncrypt;
-    order.shaEncrypt = shaEncrypt;
 
-    const submitData = {
+    const ResOrder = {
+        ...order,
+        aesEncrypt: aesEncrypt,
+        shaEncrypt: shaEncrypt
+    };
+
+    const submitData: ResPaymentItem = {
         PayGateWay,
         Version,
-        order,
+        ResOrder,
         MerchantID,
         NotifyUrl,
         ReturnUrl
