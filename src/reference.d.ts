@@ -41,6 +41,9 @@ declare global {
             NotifyUrl: string;
             PayGateWay: string;
 
+            //Ai
+            OPEN_AI_API_KEY: string;
+
             NODE_ENV: 'development' | 'production';
         }
     }

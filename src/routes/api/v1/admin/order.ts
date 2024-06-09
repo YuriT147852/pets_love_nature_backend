@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as OrderController from '@/controllers/order';
 import { Back_isAuth } from '@/utils/isAuth';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
@@ -107,6 +108,32 @@ router.get(
     '/order/:orderID',
     Back_isAuth,
     OrderController.getOrderById
+);
+
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, //60秒
+    max: 1,
+    message: '請求太頻繁，請稍後重試',
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+router.get(
+    /**
+    * #swagger.description  = "取得ai生產文案，CD60s"
+    * #swagger.parameters['text'] = { description: '生產文案內容', required: true,}
+    * #swagger.security=[{"Bearer": []}]
+    * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "message" : "文案內容",
+            }
+        }
+     */
+    '/openAi',
+    Back_isAuth,
+    apiLimiter,
+    OrderController.getAiText
 );
 
 export default router;
