@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-interface DeliveryAddress {
+export interface DeliveryAddress {
     country: string;
     county: string;
     district: string;
@@ -11,7 +11,7 @@ interface Customer extends Document {
     email: string;
 }
 
-interface OrderProduct {
+export interface OrderProduct {
     productId: Schema.Types.ObjectId;
     price: number;
     amount: number;
@@ -58,12 +58,12 @@ const orderSchema = new Schema<Order>(
         orderDate: { type: Date, default: Date.now },
         orderStatus: { type: Number, required: [true, '訂單狀態未填寫'], enum: [1, 2, 3, 4, 5, -1, -2] },
         orderAmount: { type: Number },
-        paymentMethod: { type: Number, required: [true, '付款方式未填寫'], enum: [1, 2] },
+        paymentMethod: { type: Number, enum: [1, 2] },
         deliveryUserName: { type: String, required: [true, '配送使用者姓名未填寫'] },
         deliveryAddress: { type: deliveryaddressSchema, required: [true, '配送地址未填寫'] },
         note: { type: String, default: '' },
         deliveryDate: { type: Date },
-        deliveryAmount: { type: Number, required: [true, '運費未填寫'] },
+        deliveryAmount: { type: Number },
         doneDate: { type: Date }
     },
     {

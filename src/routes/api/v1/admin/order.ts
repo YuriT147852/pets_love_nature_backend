@@ -12,6 +12,7 @@ router.get(
      * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
      * #swagger.parameters['requestSame'] = { description: '完全一致  0:false/1:true' }
      * #swagger.parameters['searchType'] = { description: '文字搜尋種類 email,orderNum' }
+     * #swagger.security=[{"Bearer": []}]
      * #swagger.responses[200] = {
             schema: {
                 "status": "success",
@@ -40,12 +41,17 @@ router.get(
 
 router.patch(
     /**
-     * #swagger.description  = "修改某一筆訂單"
+    * #swagger.description  = "修改某一筆訂單"
+    * #swagger.security=[{"Bearer": []}]
     * #swagger.parameters['body'] = {
         in: "body",
         required: true,
+        schema:{
+            "orderId": "663f2c28c52d18d64cdb4570",
+            "orderStatus": 1
+        }
     };
-     * #swagger.responses[200] = {
+    * #swagger.responses[200] = {
             schema: {
                 "status": true,
                 "message" : "更新成功",
@@ -60,6 +66,7 @@ router.patch(
 router.get(
     /**
      * #swagger.description  = "取得訂單清單"
+     * #swagger.security=[{"Bearer": []}]
      * #swagger.responses[200] = {
             schema: {
             "status": "success",
