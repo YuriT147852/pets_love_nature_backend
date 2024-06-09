@@ -206,7 +206,6 @@ router.delete(
         data: "刪除成功"
         }
     };  
-    @Parameter(name = "customerId", description = "Product id", example = "664e06e7f252412155131293")
     * #swagger.responses[404] = {
                 schema: {
                 "status": "false",
