@@ -110,7 +110,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     const totalPages = Math.ceil(totalDocuments / pageSize);
 
     // 排序
-    const sortOrderNumber: SortOrder = sortOrder === -1 ? -1 : 1;
+    const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
     // 依照傳入的變數置換排序項目
     let sortField: Record<string, SortOrder> = {};
     switch (sortBy) {
@@ -121,7 +121,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             sortField = { 'price': sortOrderNumber };
             break;
         case 'updatedAt':
-            sortField = { 'updatedAt': sortOrderNumber };
+            sortField = { 'product.updatedAt': sortOrderNumber };
             break;
         case 'productSalesQuantity':
             // todo: 計算訂單內的商品銷售數量
@@ -180,6 +180,9 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
+
+    console.log("aggregationPipeline: ", aggregationPipeline);
+
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
     if (result.length === 0) {
