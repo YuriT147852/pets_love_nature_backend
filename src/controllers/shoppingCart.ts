@@ -62,6 +62,7 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
                 select: '_id title productNumber imageGallery'
             }
         });
+        
     if (!result) {
         const customer = await CustomerModel.findById(req.params.id);
 
@@ -79,10 +80,13 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
         }
     }
 
+    // 把沒有商品資訊的部分filter掉
+    const finalResult = result?.shoppingCart.filter(eachCart => eachCart.productSpec !== null);
+
     res.status(200).json(
         successResponse({
             message: '取得購物車資料成功',
-            data: result
+            data: finalResult
         })
     );
 });
