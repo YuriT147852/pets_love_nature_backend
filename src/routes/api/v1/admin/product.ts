@@ -26,7 +26,7 @@ router.get(
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",
-                "result": { $ref: '#/definitions/ProductResponses' }
+                "result": { $ref: '#/definitions/SingleProductResponses' }
             }
         }
      * #swagger.responses[404] = {
@@ -89,31 +89,24 @@ router.patch(
     /**
      * #swagger.description  = "修改商品"
          * #swagger.security=[{"Bearer": []}]
-     * #swagger.parameters['isUptSpec'] = { 
-            description: '是否更新產品規格;', 
-            type: 'boolean',
-            required: true 
-        }
-        * #swagger.parameters['isUptSpec'] = { 
-            description: '是否更新產品規格;', 
-            type: 'boolean',
-            required: true 
-        }
      * #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema: {
+                "productId": "",
                 "title": "鮮嫩雞胸肉凍乾",
                 "subtitle": "新鮮雞胸肉，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素",
                 "category": ["dry", "fresh", "cat", "dog"],
                 "otherInfo": [{ "infoName": "產地", "infoValue": "台灣" }],
                 "productSpecList": [
                     {
+                        "id": "",
                         "weight": 50,
                         "price": 60,
                         "inStock": 50,
                     },
                     {
+                        "id": "",
                         "weight": 200,
                         "price": 180,
                         "inStock": 50,
@@ -141,7 +134,7 @@ router.patch(
             }
         }
      */
-    '/:id',
+    '',
     ProductController.updateProductById
 );
 

@@ -1,9 +1,9 @@
 import type { RequestHandler } from 'express';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
-import ProductModel from '@/models/product';
-import ProductSpecModel from '@/models/productSpec';
-import { ICreateProduct } from '@/types/product';
+import ProductModel, { IProduct } from '@/models/product';
+import ProductSpecModel, { IProductSpec } from '@/models/productSpec';
+import { ICreateProduct, IShowProduct } from '@/types/product';
 import { PipelineStage } from 'mongoose';
 
 interface MatchStage {
@@ -39,14 +39,30 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
         .populate({
             path: 'productId',
             select: 'id title subtitle description star category otherInfo imageGallery'
-        });
-
-    // console.log("result", result);
-    // const productResult: IShowProduct;
-    // const productInfo = result.productId;
-    // productResult.productSpecList = []
+        }).lean(); // 使用 .lean() 提高查詢性能;
 
     if (!result) {
+        next(errorResponse(404, '無商品資料'));
+        return;
+    }
+
+    const productSpecList = await ProductSpecModel.find({ productId: result.productId });
+
+    const productInfo = result.productId as unknown as IProduct;
+
+    const finalResult: IShowProduct = {
+        title: productInfo.title,
+        subtitle: productInfo.subtitle,
+        description: productInfo.description,
+        star: productInfo.star,
+        category: productInfo.category,
+        otherInfo: productInfo.otherInfo,
+        imageGallery: productInfo.imageGallery,
+        productSpecList: productSpecList as IProductSpec[], // 確保類型匹配
+        productNumber: productInfo.productNumber
+    };
+
+    if (!finalResult) {
         next(errorResponse(404, '無商品資料'));
         return;
     }
@@ -54,7 +70,7 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
     res.status(200).json(
         successResponse({
             message: '取得單一商品資料成功',
-            data: result,
+            data: finalResult,
         }),
     );
 });
@@ -77,7 +93,6 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
             const weight = productSpecList[i].weight;
             const price = productSpecList[i].price;
             const inStock = productSpecList[i].inStock;
-
 
             // 2.建立商品規格
             const resultProductSpec = await ProductSpecModel.create({
@@ -231,50 +246,66 @@ export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req
 
 
 // 更新商品資訊
-export const updateProductById: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const updateProductById: RequestHandler = handleErrorAsync(async (req, res, next) => {
 
     // 1.先建立商品訊息
-    const { title, subtitle, category, otherInfo, imageGallery, description, productSpecList }: ICreateProduct = req.body;
-
-
-
-
-
-    if (productSpecList.length > 0) {
-        let totalResProductSpec = 0;
-        const resultProduct = await ProductModel.create({
-            title,
-            subtitle, category, otherInfo,
-            imageGallery, description
-        });
-        const productId = await resultProduct._id;
-
-        for (let i = 0; i < productSpecList.length; i++) {
-            const productNumber = productSpecList[i].productNumber;
-            const weight = productSpecList[i].weight;
-            const price = productSpecList[i].price;
-            const inStock = productSpecList[i].inStock;
-
-
-            // 2.建立商品規格
-            const resultProductSpec = await ProductSpecModel.create({
-                productId,
-                productNumber,
-                weight,
-                price,
-                inStock
-            });
-
-            await resultProductSpec.populate({
-                path: 'productId'
-            });
-        }
-        totalResProductSpec = productSpecList.length;
-
-        res.status(200).json(
-            successResponse({
-                message: '成功建立商品ID: ' + productId + ' 成功建立 ' + totalResProductSpec + ' 商品規格'
-            }),
-        );
+    const { productId, title, subtitle, category, otherInfo, imageGallery, description, productSpecList }: ICreateProduct = req.body;
+    if (!productId) {
+        next(errorResponse(404, '無商品資料'));
+        return;
     }
+    // 2. 更新商品資訊
+    const resultProduct = await ProductModel.findByIdAndUpdate(
+        productId,
+        {
+            title,
+            subtitle,
+            category,
+            otherInfo,
+            imageGallery,
+            description
+        },
+        { new: true } // 返回更新後的文檔
+    );
+    if (!resultProduct) {
+        return next(errorResponse(404, "未找到商品"));
+    }
+    const uptProductSpecList: IProductSpec[] = [];
+    // 3. 更新商品規格
+    if (productSpecList && productSpecList.length > 0) {
+        for (let i = 0; i < productSpecList.length; i++) {
+            const { id, productNumber, weight, price, inStock } = productSpecList[i];
+            if (id) {
+                // 更新現有的商品規格
+                const uptProductSpec = await ProductSpecModel.findByIdAndUpdate(
+                    id,
+                    {
+                        productNumber,
+                        weight,
+                        price,
+                        inStock
+                    },
+                    { new: true } // 返回更新後的文檔
+                );
+                if (uptProductSpec) uptProductSpecList.push(uptProductSpec);
+            } else {
+                // 如果沒有 _id，則創建新的商品規格
+                const newProductSpec = await ProductSpecModel.create({
+                    productId: id,
+                    productNumber,
+                    weight,
+                    price,
+                    inStock
+                });
+                if (newProductSpec) uptProductSpecList.push(newProductSpec);
+            }
+        }
+    }
+    // console.log("uptProductSpecList: ", uptProductSpecList);
+    res.status(200).json(
+        successResponse({
+            message: `成功更新商品規格: ${uptProductSpecList.length} 筆`,
+            data: uptProductSpecList
+        }),
+    );
 });
