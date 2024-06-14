@@ -143,7 +143,7 @@ router.post(
         }
     }
      */
-    '/payment/:text',
+    '/payment',
     isAuth,
     OrderController.usePayment
 );
