@@ -11,34 +11,47 @@ router.get(
      * #swagger.responses[200] = {
         description: "取得成功",
         schema: {
-            "message": "成功",
-            "data": [
-                {
-                    "_id": "663f2c28c52d18d64cdb4570",
-                    "userId": "663f12237a6dabc6203875f4",
-                    "orderProductList": [
-                        {
-                            "productId": "663f18d3fc11d10c288dc062",
-                            "price": 300,
-                            "amount": 5
-                        }
-                    ],
-                    "orderDate": "2024-04-15T12:30:00.000Z",
-                    "deliveryDate": "2024-04-15T12:30:00.000Z",
-                    "orderAmount": 2000,
-                    "orderStatus": 1,
-                    "paymentMethod": 1,
-                    "shippingUserName": "2024-04-15T12:30:00.000Z",
-                    "deliveryAddress": {
-                        "country": "台灣",
-                        "county": "台北市",
-                        "district": "信義區",
-                        "address": "快樂鎮1234號5樓"
-                    },
-                    "note": "快點送",
-                    "doneDate": "2024-04-15T12:30:00.000Z"
+        "status": "success",
+        "data": {
+            "_id": "6648567e27b3916f705679d7",
+            "customerId": "663f12237a6dabc6203875f4",
+            "shoppingCart": [
+            {
+                "isChoosed": true,
+                "quantity": 1,
+                "createdAt": "2024-05-11T08:44:02.095Z",
+                "updatedAt": "2024-05-11T08:44:02.095Z",
+                "productSpec": null
+            },
+            {
+                "isChoosed": true,
+                "quantity": 1,
+                "createdAt": "2024-05-11T08:44:02.095Z",
+                "updatedAt": "2024-05-11T08:44:02.095Z",
+                "productSpec": {
+                "_id": "66487aba27b3916f705679f0",
+                "productId": {
+                    "_id": "663f18d3fc11d10c288dc062",
+                    "title": "鮮嫩雞胸肉鮮食罐頭",
+                    "productNumber": "A0001",
+                    "imageGallery": [
+                    {
+                        "_id": "6664154b8c04ba2022ebc1ee",
+                        "imgUrl": "https://images.unsplash.com/photo-1597843786411-a7fa8ad44a95?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        "altText": "狗鮮食"
+                    }
+                    ]
+                },
+                "productNumber": "B0001",
+                "weight": 76,
+                "price": 100,
+                "inStock": 10,
+                "onlineStatus": false
                 }
+            }
             ]
+        },
+        "message": "取得購物車資料成功"
         }
     }
  */
@@ -183,10 +196,8 @@ router.delete(
          in: "body",
         required: true,
         schema: {
-            {
                 "customerId": "664e06e7f252412155131293",
                 "productSpec": "663f18d3fc11d10c288dc062"
-            }
         }
     };
     * #swagger.responses[200] = {
