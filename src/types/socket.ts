@@ -3,3 +3,7 @@ export interface SocketUser {
     userId?: string;
     customerName?: string;
 }
+
+export interface SocketMsg extends SocketUser {
+    message: string;
+}
