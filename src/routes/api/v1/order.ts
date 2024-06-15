@@ -143,9 +143,11 @@ router.post(
         }
     }
      */
-    '/payment/:text',
+    '/payment',
     isAuth,
     OrderController.usePayment
 );
+
+router.post('/payment_notify', OrderController.PaymentNotify);
 
 export default router;
