@@ -90,6 +90,18 @@ const doc = {
                 ]
             },
             message: '取得單一商品資料成功'
+        },
+        CommentResponses: {
+            status: 'success',
+            data: {
+                _id: '661a9a9fa892ea2a81234561',
+                productId: '661a9a9fa892ea2a81234562',
+                orderId: '661a9a9fa892ea2a81234563',
+                userId: '661a9a9fa892ea2a81234567',
+                star: 3,
+                content: '貓吃的非常喜歡'
+            },
+            message: '取得評論成功'
         }
     }
 };
