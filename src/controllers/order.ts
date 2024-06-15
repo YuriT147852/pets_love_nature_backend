@@ -5,6 +5,7 @@ import { successResponse } from '@/utils/successHandler';
 import CustomerModel from '@/models/customer';
 import * as payment from '@/utils/payment';
 import { PaymentItem, ResPaymentItem } from '@/types/order';
+import { PaymentResponse } from '@/types/payment';
 import OpenAI from 'openai';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
@@ -263,6 +264,23 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
         successResponse({
             message: '成功抓取金流資訊',
             data: submitData
+        })
+    );
+});
+
+export const PaymentNotify: RequestHandler = handleErrorAsync((req, res, _next) => {
+    console.log('req body notify data', req.body);
+
+    const response = req.body as PaymentResponse;
+
+    //解密交易內容
+    const data = payment.createSesDecrypt(response.TradeInfo);
+    console.log('data', data);
+
+    res.status(200).json(
+        successResponse({
+            message: '成功抓取金流資訊',
+            data: '成功'
         })
     );
 });
