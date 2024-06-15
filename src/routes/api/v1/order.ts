@@ -148,4 +148,6 @@ router.post(
     OrderController.usePayment
 );
 
+router.post('/payment_notify', OrderController.PaymentNotify);
+
 export default router;
