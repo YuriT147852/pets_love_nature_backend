@@ -7,7 +7,8 @@ const router = Router();
 router.get(
     /**
      * #swagger.description  = "取得購物車資訊"
-     * #swagger.tags = ['shoppingcart - 購物車']
+     * #swagger.tags = ["ShoppingCart - 購物車"]
+     * #swagger.security=[{"Bearer": []}]
      * #swagger.responses[200] = {
         description: "取得成功",
         schema: {
@@ -140,6 +141,7 @@ router.post(
 router.post(
     /**
      * #swagger.description  = "新增商品至購物車"
+     * #swagger.security=[{"Bearer": []}]
      * #swagger.parameters['body'] = {  
          in: "body",
         required: true,
@@ -192,6 +194,7 @@ router.post(
 router.delete(
     /**
      * #swagger.description  = "刪除單筆購物車資訊"
+     * #swagger.security=[{"Bearer": []}]
      * #swagger.parameters['body'] = {
          in: "body",
         required: true,

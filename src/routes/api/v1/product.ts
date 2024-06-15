@@ -5,7 +5,7 @@ const router = Router();
 
 router.get(
     /**
-     * #swagger.description  = "取得商品列表"
+     * #swagger.description  = "取得所有商品列表"
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",
@@ -45,20 +45,21 @@ router.get(
     ProductController.getFilterProductList
 );
 
+// 取得單一商品詳細資料
 router.get(
     /**
      * #swagger.description  = "取得單一商品詳細資料"
-     * #swagger.parameters['id'] = { description: '商品ID.' }
+     * #swagger.parameters['id'] = { description: '商品規格ID' }
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",
-                "result": { $ref: '#/definitions/ProductResponses' }
+                "result": { $ref: '#/definitions/SingleProductResponses' }
             }
         }
      * #swagger.responses[404] = {
             schema: {
                 "status": "false",
-                "message": "此商品存在",
+                "message": "此商品不存在",
             }
         }
      */
