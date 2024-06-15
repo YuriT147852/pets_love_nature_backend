@@ -6,7 +6,7 @@ const router = express.Router();
 router.get(
     /**
  * #swagger.description  = "取得訂單清單"
- * #swagger.tags = ['order - 消費者']
+ * #swagger.tags = ["Order - 訂單"]
  * #swagger.security=[{"Bearer": []}]
  * #swagger.responses[200] = {
         description: "取得成功",
@@ -34,7 +34,7 @@ router.get(
     /**
  * #swagger.description  = "取得單筆訂單資訊"
  * #swagger.security=[{"Bearer": []}]
- * #swagger.tags = ['order - 消費者']
+ * #swagger.tags = ["Order - 訂單"] 
  * #swagger.responses[200] = {
         description: "取得成功",
         schema: {
@@ -77,7 +77,7 @@ router.get(
 router.post(
     /**
     * #swagger.description  = "新增結帳(連上第三方支付API)"
-    * #swagger.tags = ['order - 消費者']
+    * #swagger.tags = ["Order - 訂單"]
     * #swagger.security=[{"Bearer":[]}]
     * #swagger.parameters['body'] = {
         in: "body",

@@ -268,7 +268,7 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
         { new: true } // 返回更新後的文檔
     );
     if (!resultProduct) {
-        return next(errorResponse(404, "未找到商品"));
+        return next(errorResponse(404, "未找到商品資訊"));
     }
     const uptProductSpecList: IProductSpec[] = [];
     // 3. 更新商品規格

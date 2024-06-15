@@ -8,6 +8,7 @@ import shoppingCart from './api/v1/shoppingCart';
 import upload from './api/v1/admin/upload';
 import adminOrder from '@/routes/api/v1/admin/order';
 import admin from '@/routes/api/v1/admin/index';
+import comment from './api/v1/comment';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -34,7 +35,7 @@ routes.use(
 
 routes.use(
     /**
-     * #swagger.tags = ["Customer - 消費者"]
+     * #swagger.tags = ["Order - 訂單"]
      */
     '/api/v1/',
     order
@@ -50,15 +51,15 @@ routes.use(
 
 routes.use(
     /**
-     * #swagger.tags = ["Product - 商品"]
+     * #swagger.tags = ["Comment - 評價"]
      */
-    '/api/v1/product',
-    product
+    '/api/v1/comment',
+    comment
 );
 
 routes.use(
     /**
-     * #swagger.tags = ["shoppingcart - 購物車"]
+     * #swagger.tags = ["ShoppingCart - 購物車"]
      */
     '/api/v1/shopping_cart',
     shoppingCart
