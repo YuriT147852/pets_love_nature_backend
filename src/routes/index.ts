@@ -9,6 +9,7 @@ import upload from './api/v1/admin/upload';
 import adminOrder from '@/routes/api/v1/admin/order';
 import admin from '@/routes/api/v1/admin/index';
 import comment from './api/v1/comment';
+import banner from './api/v1/admin/banner';
 import chat from './api/v1/chat';
 
 // import user from './api/v1/user';
@@ -104,6 +105,14 @@ routes.use(
      */
     '/api/v1/admin/upload',
     upload
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["Admin / Banner - 管理者 / Banner"]
+     */
+    '/api/v1/admin/banner',
+    banner
 );
 
 export default routes;
