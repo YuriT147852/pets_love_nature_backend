@@ -14,17 +14,18 @@ export const getBanner: RequestHandler = handleErrorAsync(async (_req, res, _nex
 });
 
 export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { ImgUrl, hyperlink, title, subtitle } = req.body;
+    const { imgUrl, hyperlink, title, subtitle, active } = req.body;
 
-    if (!ImgUrl || !hyperlink || !title || !subtitle) {
+    if (!imgUrl || !hyperlink || !title || !subtitle || !active) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
         await bannerModel.create({
-            ImgUrl,
+            imgUrl,
             hyperlink,
             title,
-            subtitle
+            subtitle,
+            active
         });
         const result = await bannerModel.find({});
         res.status(200).json(
@@ -37,8 +38,8 @@ export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next)
 });
 
 export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { ImgUrl, hyperlink, title, subtitle } = req.body;
-    if (!ImgUrl || !hyperlink || !title || !subtitle) {
+    const { imgUrl, hyperlink, title, subtitle, active } = req.body;
+    if (!imgUrl || !hyperlink || !title || !subtitle || !active) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
@@ -46,10 +47,11 @@ export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res
         const resultBanner = await bannerModel.findByIdAndUpdate(
             id,
             {
-                ImgUrl,
+                imgUrl,
                 hyperlink,
                 title,
-                subtitle
+                subtitle,
+                active
             },
             { new: true } // 返回更新後的文檔
         );
