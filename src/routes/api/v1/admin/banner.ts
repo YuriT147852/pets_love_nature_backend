@@ -19,7 +19,8 @@ router.get(
                 "imgUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fzh.wikipedia.org%2Fzh-tw%2F%25E7%259A%25AE%25E5%258D%25A1%25E4%25B8%2598&psig=AOvVaw0_Wet9EgEid1MVb1EemYcP&ust=1718547829161000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCOiDgdjn3YYDFQAAAAAdAAAAABAE",
                 "hyperlink": "https://tw.yahoo.com",
                 "title": "全人食等級，寵愛每一口",
-                "subtitle": "原塊肉品，天然凍乾，保留原味原相"
+                "subtitle": "原塊肉品，天然凍乾，保留原味原相",
+                "active": true
                 }
             ],
             "message": "取得banner成功"
@@ -42,7 +43,8 @@ router.post(
             "imgUrl": "https://cdn.vox-cdn.com/thumbor/lWOGzsPeAD6YzEVVNH001nrSqPM=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/24458108/captain_pikachu.jpg",
             "hyperlink": "https://tw.yahoo.com",
             "title": "好吃的食物在這裡",
-            "subtitle": "好吃的食物在那裡"
+            "subtitle": "好吃的食物在那裡",
+            "active": true
         }
     };
     * #swagger.responses[200] = {
@@ -54,14 +56,16 @@ router.post(
             "imgUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fzh.wikipedia.org%2Fzh-tw%2F%25E7%259A%25AE%25E5%258D%25A1%25E4%25B8%2598&psig=AOvVaw0_Wet9EgEid1MVb1EemYcP&ust=1718547829161000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCOiDgdjn3YYDFQAAAAAdAAAAABAE",
             "hyperlink": "https://tw.yahoo.com",
             "title": "全人食等級，寵愛每一口",
-            "subtitle": "原塊肉品，天然凍乾，保留原味原相"
+            "subtitle": "原塊肉品，天然凍乾，保留原味原相",
+            "active": true
             },
             {
             "_id": "666e84f4c0f5b12e507de79c",
             "imgUrl": "https://cdn.vox-cdn.com/thumbor/lWOGzsPeAD6YzEVVNH001nrSqPMfilters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/24458108/captain_pikachu.jpg",
             "hyperlink": "https://tw.yahoo.com",
             "title": "好吃的食物在這裡",
-            "subtitle": "好吃的食物在那裡"
+            "subtitle": "好吃的食物在那裡",
+            "active": true
             }
         ],
         "message": "新增banner成功"
@@ -89,7 +93,8 @@ router.patch(
             "imgUrl": "https://cdn.vox-cdn.com/thumbor/lWOGzsPeAD6YzEVVNH001nrSqPM=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/24458108/captain_pikachu.jpg",
             "hyperlink": "https://tw.yahoo.com",
             "title": "好吃的食物在這裡1",
-            "subtitle": "好吃的食物在那裡1"
+            "subtitle": "好吃的食物在那裡1",
+            "active": true
         }
     };
     * #swagger.responses[200] = {
@@ -101,14 +106,16 @@ router.patch(
             "imgUrl": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fzh.wikipedia.org%2Fzh-tw%2F%25E7%259A%25AE%25E5%258D%25A1%25E4%25B8%2598&psig=AOvVaw0_Wet9EgEid1MVb1EemYcP&ust=1718547829161000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCOiDgdjn3YYDFQAAAAAdAAAAABAE",
             "hyperlink": "https://tw.yahoo.com",
             "title": "全人食等級，寵愛每一口",
-            "subtitle": "原塊肉品，天然凍乾，保留原味原相"
+            "subtitle": "原塊肉品，天然凍乾，保留原味原相",
+            "active": true
             },
             {
             "_id": "666e84f4c0f5b12e507de79c",
             "imgUrl": "https://cdn.vox-cdn.com/thumbor/lWOGzsPeAD6YzEVVNH001nrSqPMfilters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/24458108/captain_pikachu.jpg",
             "hyperlink": "https://tw.yahoo.com",
             "title": "好吃的食物在這裡",
-            "subtitle": "好吃的食物在那裡"
+            "subtitle": "好吃的食物在那裡",
+            "active": true
             }
         ],
         "message": "更新banner成功"
