@@ -11,8 +11,8 @@ interface IComment extends Document {
 const commentSchema = new Schema<IComment>(
     {
         customerId: { type: Schema.Types.ObjectId, required: [true, '消費者ID未填寫'], ref: 'Customer' },
-        productId: { type: Schema.Types.ObjectId, required: [true, '消費者ID未填寫'], ref: 'Product' },
-        orderId: { type: Schema.Types.ObjectId, required: [true, '消費者ID未填寫'], ref: 'Order' },
+        productId: { type: Schema.Types.ObjectId, required: [true, '商品ID未填寫'], ref: 'product' },
+        orderId: { type: Schema.Types.ObjectId, required: [true, '訂單ID未填寫'], ref: 'Order' },
         star: { type: Number, required: [true, '評分未填寫'] },
         comment: { type: String },
     },
