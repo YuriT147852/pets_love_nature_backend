@@ -100,7 +100,7 @@ routes.use(
 
 routes.use(
     /**
-     * #swagger.tags = ["Admin / Upload - 管理者 / Banner"]
+     * #swagger.tags = ["Admin / Banner - 管理者 / Banner"]
      */
     '/api/v1/admin/banner',
     banner

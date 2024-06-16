@@ -17,8 +17,8 @@ export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next)
     const { ImgUrl, hyperlink, title, subtitle } = req.body;
 
     if (!ImgUrl || !hyperlink || !title || !subtitle) {
-        next(errorResponse(404, '資料不齊全'));
-        return
+        next(errorResponse(404, '欄位錯誤'));
+        return;
     } else {
         await bannerModel.create({
             ImgUrl,
@@ -36,11 +36,11 @@ export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next)
     }
 });
 
-export const updateBannerById: RequestHandler = handleErrorAsync(async(req, res, next) => {
+export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const { ImgUrl, hyperlink, title, subtitle } = req.body;
     if (!ImgUrl || !hyperlink || !title || !subtitle) {
-        next(errorResponse(404, '資料不齊全'));
-        return
+        next(errorResponse(404, '欄位錯誤'));
+        return;
     } else {
         const id = req?.params?.id;
         const resultBanner = await bannerModel.findByIdAndUpdate(
@@ -54,21 +54,21 @@ export const updateBannerById: RequestHandler = handleErrorAsync(async(req, res,
             { new: true } // 返回更新後的文檔
         );
 
-        if(!resultBanner) {
+        if (!resultBanner) {
             next(errorResponse(404, '此banner id不存在'));
-            return
+            return;
         } else {
             res.status(200).json(
                 successResponse({
-                    message: '更新購物車資料成功',
+                    message: '更新banner資料成功',
                     data: resultBanner
                 })
             );
         }
     }
-})
+});
 
-export const deleteBannerById: RequestHandler = handleErrorAsync(async(req, res, next) => {
+export const deleteBannerById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const id = req?.params?.id;
     const result = await bannerModel.findByIdAndRemove(id);
 
@@ -80,6 +80,6 @@ export const deleteBannerById: RequestHandler = handleErrorAsync(async(req, res,
     res.status(200).json(
         successResponse({
             message: '刪除banner成功'
-        }),
+        })
     );
-})
+});
