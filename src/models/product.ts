@@ -3,6 +3,7 @@ import otherInfoSchema, { IOtherInfo } from './schema/otherInfo';
 import imageGallerySchema, { IImageGallery } from './schema/imageGallery';
 
 export interface IProduct extends Document {
+  productId: string;
   title: string;
   subtitle: string;
   description: string;

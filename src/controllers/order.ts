@@ -5,6 +5,8 @@ import { successResponse } from '@/utils/successHandler';
 import CustomerModel from '@/models/customer';
 import * as payment from '@/utils/payment';
 import { PaymentItem, ResPaymentItem } from '@/types/order';
+import { PaymentResponse } from '@/types/payment';
+import OpenAI from 'openai';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await OrderModel.find(
@@ -266,6 +268,23 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
     );
 });
 
+export const PaymentNotify: RequestHandler = handleErrorAsync((req, res, _next) => {
+    console.log('req body notify data', req.body);
+
+    const response = req.body as PaymentResponse;
+
+    //解密交易內容
+    const data = payment.createSesDecrypt(response.TradeInfo);
+    console.log('data', data);
+
+    res.status(200).json(
+        successResponse({
+            message: '成功抓取金流資訊',
+            data: '成功'
+        })
+    );
+});
+
 export const editOrderStatus: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const { orderId, orderStatus }: { orderId: string; orderStatus: number } = req.body;
 
@@ -288,7 +307,6 @@ export const editOrderStatus: RequestHandler = handleErrorAsync(async (req, res,
         return;
     }
 
-    console.log(result);
     res.status(200).json(
         successResponse({
             message: '更新成功'
@@ -312,6 +330,63 @@ export const getOrderById: RequestHandler = handleErrorAsync(async (req, res, ne
         successResponse({
             message: '取得消費者訂單成功',
             data: result
+        })
+    );
+});
+
+export const getAiText: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const text = req.query.text as string;
+
+    if (!text) {
+        next(errorResponse(404, 'text參數錯誤'));
+        return;
+    }
+
+    const openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
+
+    const chatCompletion = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo-16k',
+        messages: [
+            {
+                // 環境與規則
+                role: 'system',
+                content: '你是一個電商賣家,賣各種寵物食品,需要生成文案'
+            },
+            {
+                // 代表用戶輸入,問題
+                role: 'user',
+                content: text
+            },
+            {
+                // 預期的助手回答
+                role: 'assistant',
+                content: '好的，請稍等，我將生成一段關於這個產品的文案。'
+            },
+            {
+                // 代表用戶進一步輸入或確認
+                role: 'user',
+                content: '好的，麻煩你了。'
+            }
+        ],
+        // 限制最大長度
+        // max_tokens: 150,
+        // 0~1 越大隨機性越大
+        temperature: 0.7,
+        // 生成概率質量
+        top_p: 0.9,
+        // 重複度
+        frequency_penalty: 0,
+        // 新穎度
+        presence_penalty: 0.6
+    });
+
+    const ResText = chatCompletion.choices[0].message.content;
+    const AiText = ResText ? ResText.trim() : '';
+
+    res.status(200).json(
+        successResponse({
+            message: '文案取得成功',
+            data: AiText
         })
     );
 });

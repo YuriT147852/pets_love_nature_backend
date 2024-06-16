@@ -12,9 +12,8 @@ const upload = multer({
 
 router.post('/image', upload.single('file'),
   /*
-    #swagger.tags= ['Upload']
     #swagger.description = '上傳一張圖片，支援JPG、PNG和GIF格式，大小限制為5MB'
-    #swagger.security = [{'api_key': ['apiKeyAuth']}]
+    #swagger.security=[{"Bearer": []}]
     #swagger.consumes = ['multipart/form-data']
       #swagger.parameters['file'] = {
         in: 'formData',
