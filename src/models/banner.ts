@@ -1,14 +1,14 @@
 import { Schema, model, type Document } from 'mongoose';
 
 export interface IBanner extends Document {
-    ImgUrl: string;
+    imgUrl: string;
     hyperlink: string;
     title: string;
     subtitle: string
 };
 
 const bannerSchema = new Schema<IBanner>({
-    ImgUrl: {
+    imgUrl: {
         type: String,
         require: [true, "圖片網址未填寫"]
     },
