@@ -5,6 +5,7 @@ import { successResponse } from '@/utils/successHandler';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { generateToken } from '@/utils/index';
 import CustomerModel from '@/models/customer';
+import ChatModel from '@/models/chat';
 
 const app = express();
 
@@ -111,6 +112,10 @@ export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (re
         // console.log('需註冊');
         const resCustomer = await CustomerModel.create({ email, customerName: name, image: picture });
         const token = generateToken({ userId: resCustomer._id });
+
+        //增加聊天室
+        await ChatModel.create({ userId: resCustomer._id, messageList: [] });
+
         res.status(200).json(
             successResponse({
                 message: '第一次註冊+登入成功',
