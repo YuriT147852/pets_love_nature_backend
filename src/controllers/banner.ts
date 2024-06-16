@@ -16,7 +16,7 @@ export const getBanner: RequestHandler = handleErrorAsync(async (_req, res, _nex
 export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const { imgUrl, hyperlink, title, subtitle, active } = req.body;
 
-    if (!imgUrl || !hyperlink || !title || !subtitle || !active) {
+    if (!imgUrl || !hyperlink || !title || !subtitle) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
@@ -39,7 +39,7 @@ export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next)
 
 export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const { imgUrl, hyperlink, title, subtitle, active } = req.body;
-    if (!imgUrl || !hyperlink || !title || !subtitle || !active) {
+    if (!imgUrl || !hyperlink || !title || !subtitle) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
