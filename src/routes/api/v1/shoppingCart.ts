@@ -191,6 +191,78 @@ router.post(
     CartController.addCart
 )
 
+router.patch(
+    /**
+     * #swagger.description  = "更新isChoosed狀態"
+     * #swagger.parameters['body'] = {  
+         in: "body",
+        required: true,
+        schema: {
+            "customerId": "664e06e7f252412155131293",
+            "shoppingCart": [
+                {
+                    "productSpec": "664c984699eb1ab9b3c4f679",
+                    "isChoosed": true
+                },
+                {
+                    "productSpec": "665deb4c904012a106605d63",
+                    "isChoosed": true
+                }
+            ]
+        }
+    };
+    * #swagger.responses[200] = {
+        schema: {
+  "status": "success",
+  "data": {
+    "_id": "66686259772c718d2ebe3de5",
+    "customerId": "664e06e7f252412155131293",
+    "shoppingCart": [
+      {
+        "quantity": 2,
+        "isChoosed": true,
+        "productSpec": "664c984699eb1ab9b3c4f679",
+        "createdAt": "2024-06-16T12:24:25.905Z",
+        "updatedAt": "2024-06-16T15:31:20.894Z"
+      },
+      {
+        "quantity": 1,
+        "isChoosed": true,
+        "productSpec": "665deb4c904012a106605d63",
+        "createdAt": "2024-06-16T12:35:24.074Z",
+        "updatedAt": "2024-06-16T15:31:20.894Z"
+      },
+      {
+        "quantity": 1,
+        "isChoosed": false,
+        "productSpec": "664c90d099eb1ab9b3c4f645",
+        "createdAt": "2024-06-16T12:35:30.275Z",
+        "updatedAt": "2024-06-16T15:39:26.017Z"
+      },
+      {
+        "quantity": 1,
+        "isChoosed": false,
+        "productSpec": "665a9f704a2dbe2bbf936565",
+        "createdAt": "2024-06-16T12:35:40.963Z",
+        "updatedAt": "2024-06-16T12:35:40.963Z"
+      }
+    ]
+  },
+  "message": "成功"
+}
+    };
+    * #swagger.responses[404] = {
+                schema: {
+                "status": "false",
+                "message": "欄位錯誤",
+            }
+        }
+     */
+    "/",
+    isAuth,
+    CartController.updateIsChoosed)
+
+
 router.delete(
     /**
      * #swagger.description  = "刪除單筆購物車資訊"
