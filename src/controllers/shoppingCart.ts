@@ -62,7 +62,7 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
                 select: '_id title productNumber imageGallery'
             }
         });
-        
+
     if (!result) {
         const customer = await CustomerModel.findById(req.params.id);
 
@@ -77,6 +77,7 @@ export const getCartById: RequestHandler = handleErrorAsync(async (req, res, nex
             );
         } else {
             next(errorResponse(404, '此customer id不存在'));
+            return;
         }
     }
 
@@ -203,6 +204,36 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
                 data: checkedInStock
             })
         );
+    }
+});
+
+export const updateIsChoosed: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { customerId, shoppingCart } = req.body;
+
+    const customerData = await shoppingCartModel.findOne({
+        customerId: customerId
+    });
+
+    if (customerData) {
+        for (let i = 0; i < shoppingCart.length; i++) {
+            for (let j = 0; j < customerData.shoppingCart.length; j++) {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                if (shoppingCart[i].productSpec === customerData.shoppingCart[j].productSpec.toString()) {
+                    // 調整isChoosed狀態
+                    customerData.shoppingCart[j].isChoosed = shoppingCart[i].isChoosed;
+                }
+            }
+        }
+        const resData = await customerData.save(); // 更新
+        res.status(200).json(
+            successResponse({
+                message: '成功',
+                data: resData
+            })
+        );
+    } else {
+        next(errorResponse(404, '此customer id不存在'));
+        return;
     }
 });
 
