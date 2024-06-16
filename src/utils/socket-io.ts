@@ -28,7 +28,8 @@ export function connectSocketIO(server: HTTPServer) {
 
             // 第一次先驗證是否為後台管理員
             const user: SocketUser = {
-                role: 'admin'
+                role: 'admin',
+                userId: ''
             };
 
             emitConnectStatus(socket, user);
@@ -50,7 +51,7 @@ export function connectSocketIO(server: HTTPServer) {
                     return next(new Error('User not found'));
                 }
 
-                const user = {
+                const user: SocketUser = {
                     userId: decoded.userId,
                     role: 'client',
                     customerName: result.customerName
@@ -88,46 +89,86 @@ export function connectSocketIO(server: HTTPServer) {
             }
         });
 
+        //傳訊息
         socket.on('message', async data => {
-            const { message, userId, role } = data as SocketMsg;
+            try {
+                const { message, userId, role } = data as SocketMsg;
 
-            if (!userId) {
-                emitErrorMsg(socket, 'userId不存在');
-                return;
-            }
+                const status = DataHandler(userId, role);
 
-            if (role === 'client') {
-                //製作message
+                if (!status.status) {
+                    emitErrorMsg(socket, status.message);
+                    return;
+                }
+
                 const newMessage = {
-                    role: 'client',
+                    role,
                     read: false,
                     message,
                     chatId: new mongoose.Types.ObjectId('661a9a9fa892ea2a833a1009')
                 };
-                console.log(newMessage);
-                await ChatModel.findOneAndUpdate({ userId }, { $push: { messageList: newMessage } });
-                //只傳給admin
-                io.emit('admin message', newMessage);
-            }
 
-            if (role === 'admin') {
-                //製作message
-                const newMessage = {
-                    role: 'admin',
-                    read: false,
-                    message,
-                    chatId: new mongoose.Types.ObjectId('661a9a9fa892ea2a833a1009')
-                };
                 await ChatModel.findOneAndUpdate({ userId }, { $push: { messageList: newMessage } });
-                //只傳給特定人
-                io.to(userId).emit('message', newMessage);
+
+                if (role === 'client') {
+                    io.emit('admin message', newMessage);
+                } else if (role === 'admin') {
+                    io.to(userId).emit('message', newMessage);
+                }
+            } catch (error) {
+                emitErrorMsg(socket, '傳送訊息失敗');
             }
         });
 
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
+        //已讀
+        socket.on('read', async data => {
+            try {
+                const { userId, role } = data as SocketMsg;
+                const status = DataHandler(userId, role);
+                if (!status.status) {
+                    emitErrorMsg(socket, status.message);
+                    return;
+                }
+
+                //只更新該userId 並且把裡面的messageList根據role篩選後把read變成true
+                await ChatModel.updateMany(
+                    { userId },
+                    { $set: { 'messageList.$[elem].read': true } },
+                    {
+                        arrayFilters: [{ 'elem.role': role === 'client' ? 'admin' : 'client' }],
+                        multi: true
+                    }
+                );
+
+                if (role === 'client') {
+                    io.emit('admin read', { status: 'success', userId, message: '已成功標記為已讀' });
+                } else if (role === 'admin') {
+                    io.to(userId).emit('read', { status: 'success', message: '已成功標記為已讀' });
+                }
+            } catch (error) {
+                emitErrorMsg(socket, '標記訊息為已讀失敗');
+            }
         });
     });
+}
+
+function DataHandler(userId: string, role: string) {
+    if (!userId) {
+        return {
+            status: false,
+            message: 'userId不存在'
+        };
+    } else if (!role) {
+        return {
+            status: false,
+            message: 'userId不存在'
+        };
+    } else {
+        return {
+            status: true,
+            message: '驗證通過'
+        };
+    }
 }
 
 function emitConnectStatus(socket: Socket, user: SocketUser) {
