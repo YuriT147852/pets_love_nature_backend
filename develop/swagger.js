@@ -94,12 +94,40 @@ const doc = {
         CommentResponses: {
             status: 'success',
             data: {
-                _id: '661a9a9fa892ea2a81234561',
-                productId: '661a9a9fa892ea2a81234562',
-                orderId: '661a9a9fa892ea2a81234563',
-                userId: '661a9a9fa892ea2a81234567',
-                star: 3,
-                content: '貓吃的非常喜歡'
+                _id: '666ea32b2949401b22e54e4e',
+                customerId: {
+                    _id: '663f12237a6dabc6203875f4',
+                    email: 'd22495521@gmail.com',
+                    customerName: '王大頭3',
+                    image: ''
+                },
+                productId: {
+                    _id: '665a9f704a2dbe2bbf936563',
+                    title: '鮮嫩牛腿排凍乾',
+                    subtitle: '新鮮牛腿排，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素',
+                    star: 4.3,
+                    category: ['dry', 'fresh', 'cat', 'dog'],
+                    otherInfo: [
+                        {
+                            infoName: '產地',
+                            infoValue: '台灣'
+                        }
+                    ],
+                    imageGallery: [
+                        {
+                            _id: '666eaed89a628a2a0740e90b',
+                            imgUrl: 'https://images.unsplash.com/photo-1597843786411-a7fa8ad44a95?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                            altText: '狗鮮食'
+                        }
+                    ]
+                },
+                orderId: {
+                    _id: '666e983c8e72d5cb153de579'
+                },
+                star: 4.2,
+                comment: '貓吃的非常喜歡',
+                createdAt: '2024-06-16T08:32:43.194Z',
+                updatedAt: '2024-06-16T08:32:43.194Z'
             },
             message: '取得評論成功'
         }
