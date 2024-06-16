@@ -14,14 +14,14 @@ export const getBanner: RequestHandler = handleErrorAsync(async (_req, res, _nex
 });
 
 export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { ImgUrl, hyperlink, title, subtitle } = req.body;
+    const { imgUrl, hyperlink, title, subtitle } = req.body;
 
-    if (!ImgUrl || !hyperlink || !title || !subtitle) {
+    if (!imgUrl || !hyperlink || !title || !subtitle) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
         await bannerModel.create({
-            ImgUrl,
+            imgUrl,
             hyperlink,
             title,
             subtitle
@@ -37,8 +37,8 @@ export const addBanner: RequestHandler = handleErrorAsync(async (req, res, next)
 });
 
 export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { ImgUrl, hyperlink, title, subtitle } = req.body;
-    if (!ImgUrl || !hyperlink || !title || !subtitle) {
+    const { imgUrl, hyperlink, title, subtitle } = req.body;
+    if (!imgUrl || !hyperlink || !title || !subtitle) {
         next(errorResponse(404, '欄位錯誤'));
         return;
     } else {
@@ -46,7 +46,7 @@ export const updateBannerById: RequestHandler = handleErrorAsync(async (req, res
         const resultBanner = await bannerModel.findByIdAndUpdate(
             id,
             {
-                ImgUrl,
+                imgUrl,
                 hyperlink,
                 title,
                 subtitle
