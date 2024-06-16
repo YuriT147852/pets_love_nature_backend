@@ -9,6 +9,7 @@ import upload from './api/v1/admin/upload';
 import adminOrder from '@/routes/api/v1/admin/order';
 import admin from '@/routes/api/v1/admin/index';
 import comment from './api/v1/comment';
+import chat from './api/v1/chat';
 
 // import user from './api/v1/user';
 // import { callback } from '@/controllers/user';
@@ -63,6 +64,14 @@ routes.use(
      */
     '/api/v1/shopping_cart',
     shoppingCart
+);
+
+routes.use(
+    /**
+     * #swagger.tags = ["chat - 聊天室"]
+     */
+    '/api/v1/chat',
+    chat
 );
 
 routes.use(
