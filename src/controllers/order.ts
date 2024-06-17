@@ -226,7 +226,7 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
         userId,
         orderProductList,
         deliveryAddress,
-        orderStatus: 1,
+        orderStatus: -3,
         deliveryUserName
     });
 
@@ -268,7 +268,7 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
     );
 });
 
-export const PaymentNotify: RequestHandler = handleErrorAsync((req, res, _next) => {
+export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, next) => {
     console.log('req body notify data', req.body);
 
     const response = req.body as PaymentResponse;
@@ -276,6 +276,28 @@ export const PaymentNotify: RequestHandler = handleErrorAsync((req, res, _next) 
     //解密交易內容
     const data = payment.createSesDecrypt(response.TradeInfo);
     console.log('data', data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const orderId = data?.Result?.MerchantOrderNo;
+    //找是否有這個訂單
+    const result = await OrderModel.findOne({ _id: orderId });
+
+    if (!result) {
+        next(errorResponse(404, '無訂單資料'));
+        return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (data?.Result?.Status !== 'SUCCESS') {
+        next(errorResponse(404, '訂單失敗'));
+        return;
+    }
+
+    //成功就更新狀態
+    await OrderModel.updateOne({ _id: orderId }, { orderId: 1 });
+
+    //把購物車是TRUE刪掉
+    // await shoppingCartModel.updateOne({ _id: orderId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
     res.status(200).json(
         successResponse({
