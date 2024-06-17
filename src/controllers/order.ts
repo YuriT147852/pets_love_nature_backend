@@ -283,18 +283,22 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const orderId = data?.Result?.MerchantOrderNo;
+    console.log('orderId', orderId);
     //找是否有這個訂單
     const result = await OrderModel.findOne({ _id: orderId });
 
     console.log('result', result);
 
     if (!result) {
+        console.log('無訂單資料');
         next(errorResponse(404, '無訂單資料'));
         return;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (data?.Result?.Status !== 'SUCCESS') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        console.log('訂單失敗', data?.Result?.Status);
         next(errorResponse(404, '訂單失敗'));
         return;
     }
