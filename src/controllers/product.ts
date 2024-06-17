@@ -279,10 +279,12 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
     } else {
         // 無商品資訊
         // 更新商品規格
+        let hasProductSpecId = false;
         if (productSpecList && productSpecList.length > 0) {
             for (let i = 0; i < productSpecList.length; i++) {
                 const { id, productNumber, weight, price, inStock, onlineStatus } = productSpecList[i];
                 if (id) {
+                    hasProductSpecId = true;
                     // 更新現有的商品規格
                     const uptProductSpec = await ProductSpecModel.findByIdAndUpdate(
                         id,
@@ -290,7 +292,9 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
                             productNumber,
                             weight,
                             price,
-                            inStock, onlineStatus
+                            inStock,
+                            onlineStatus,
+                            onlineDate: onlineStatus ? Date.now() : ''
                         },
                         { new: true } // 返回更新後的文檔
                     );
@@ -303,6 +307,11 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
                 }
             }
         }
+
+        if (!hasProductSpecId && !productId) {
+            next(errorResponse(404, '請輸入欲更新的商品資訊 ID 或是商品規格 ID'));
+        }
+
         res.status(200).json(
             successResponse({
                 message: `成功更新商品: ${returnResult}`
@@ -323,7 +332,8 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
                         weight,
                         price,
                         inStock,
-                        onlineStatus
+                        onlineStatus,
+                        onlineDate: onlineStatus ? Date.now() : ''
                     },
                     { new: true } // 返回更新後的文檔
                 );
