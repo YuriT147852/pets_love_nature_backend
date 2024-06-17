@@ -274,21 +274,16 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
 });
 
 export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    console.log('req body notify data', req.body);
-
     const response = req.body as PaymentResponse;
 
     //解密交易內容
     const data = payment.createSesDecrypt(response.TradeInfo);
-    console.log('data', data);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const orderId = data?.Result?.MerchantOrderNo;
-    console.log('orderId', orderId);
+
     //找是否有這個訂單
     const result = await OrderModel.findOne({ _id: orderId });
-
-    console.log('result', result);
 
     if (!result) {
         console.log('無訂單資料');
