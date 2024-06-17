@@ -7,7 +7,6 @@ import * as payment from '@/utils/payment';
 import { PaymentItem, ResPaymentItem } from '@/types/order';
 import { PaymentResponse } from '@/types/payment';
 import OpenAI from 'openai';
-import shoppingCartModel from '@/models/shoppingCart';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await OrderModel.find(
