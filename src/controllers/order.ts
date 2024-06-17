@@ -7,6 +7,8 @@ import * as payment from '@/utils/payment';
 import { PaymentItem, ResPaymentItem } from '@/types/order';
 import { PaymentResponse } from '@/types/payment';
 import OpenAI from 'openai';
+import shoppingCartModel from '@/models/shoppingCart';
+import { Customer } from '@/models/customer';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await OrderModel.find(
@@ -83,7 +85,7 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
     if (!searchText) {
         const result = await OrderModel.find({}, { _id: true, orderStatus: true })
             .sort({ orderStatus: filter })
-            .populate({ path: 'userId', select: 'email' })
+            .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
 
@@ -152,7 +154,7 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
 
         const OrderResult = await OrderModel.find({ $or: formatResult }, { _id: true, orderStatus: true })
             .sort({ orderStatus: filter })
-            .populate({ path: 'userId', select: 'email' })
+            .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
 
@@ -183,7 +185,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             return;
         }
 
-        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate({
+        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate<{
+            userId: Customer;
+        }>({
             path: 'userId',
             select: 'email'
         });
@@ -282,6 +286,8 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     //找是否有這個訂單
     const result = await OrderModel.findOne({ _id: orderId });
 
+    console.log('result', result);
+
     if (!result) {
         next(errorResponse(404, '無訂單資料'));
         return;
@@ -296,8 +302,11 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     //成功就更新狀態
     await OrderModel.updateOne({ _id: orderId }, { orderId: 1 });
 
-    //把購物車是TRUE刪掉
-    // await shoppingCartModel.updateOne({ _id: orderId }, { $pull: { shoppingCart: { isChoosed: true } } });
+    //先抓
+    const userId = result.userId;
+
+    //把購物車裡shoppingCart是TRUE刪掉
+    await shoppingCartModel.updateOne({ _id: userId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
     res.status(200).json(
         successResponse({
