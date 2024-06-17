@@ -310,7 +310,7 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     const userId = result.userId;
 
     //把購物車裡shoppingCart是TRUE刪掉
-    await shoppingCartModel.updateOne({ _id: userId }, { $pull: { shoppingCart: { isChoosed: true } } });
+    await shoppingCartModel.updateMany({ customerId: userId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
     res.status(200).json(
         successResponse({
