@@ -296,7 +296,7 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (data?.Result?.Status !== 'SUCCESS') {
+    if (data.Status !== 'SUCCESS') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         console.log('訂單失敗', data?.Result?.Status);
         next(errorResponse(404, '訂單失敗'));
