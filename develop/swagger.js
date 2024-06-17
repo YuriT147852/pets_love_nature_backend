@@ -25,7 +25,8 @@ const doc = {
             inStock: 50,
             onlineStatus: false,
             onlineDate: '',
-            product: {
+            productId: {
+                _id: '661a9a9fa892ea2a81234567',
                 title: '鮮嫩雞胸肉鮮食罐頭',
                 subtitle: '新鮮雞胸肉，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素。',
                 category: ['fresh', 'dog'],

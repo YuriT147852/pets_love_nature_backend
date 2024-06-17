@@ -5,6 +5,7 @@ import ProductModel, { IProduct } from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
 import { ICreateProduct, IShowProduct, IShowProductSpec } from '@/types/product';
 import { PipelineStage } from 'mongoose'
+
 interface MatchStage {
     [key: string]: {
         $regex?: RegExp;
@@ -119,7 +120,7 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
 
 // 查詢前台篩選商品
 export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
-    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory } = req.query;
+    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory, onlineStatus } = req.query;
 
     // 默認 1 頁顯示 10 筆
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
@@ -190,6 +191,11 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     if (filterCategory) {
         matchStage['product.category'] = { $in: [filterCategory] };
     }
+    // 如果上限狀態有值
+    if (onlineStatus !== undefined) {
+        matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
+    }
+
     // 如果 matchStage 不是空對象，則添加 $match 階段
     if (Object.keys(matchStage).length > 0) {
         aggregationPipeline.push({ $match: matchStage });
@@ -201,9 +207,10 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
-    // console.log("aggregationPipeline: ", aggregationPipeline);
+    console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
+    console.log("result: ", result);
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
@@ -347,3 +354,4 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
         }),
     );
 });
+

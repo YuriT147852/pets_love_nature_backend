@@ -21,7 +21,13 @@ router.get(
 
 router.get(
     /**
-     * #swagger.description  = "取得篩選條件商品列表"
+     * #swagger.description  = "取得篩選條件商品列表"          
+     * #swagger.parameters['onlineStatus'] = {
+            required: false,
+            description: '上線狀態',
+            type: 'boolean',
+            enum:['true','false'],
+            }
      * #swagger.parameters['searchText'] = { description: '關鍵字' }
      * #swagger.parameters['filterCategory'] = { description: '分類；fresh、cat、dog、dry' }
      * #swagger.parameters['sortOrder'] = { description: '選擇排序方式，預設-1；-1 由大到小 / 1 由小到大' }
