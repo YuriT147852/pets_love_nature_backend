@@ -8,6 +8,7 @@ export interface IProductSpec extends Document {
   inStock: number;
   onlineStatus: boolean;
   onlineDate: Date;
+  isValid: boolean; // 若刪除商品規格則顯示false
 }
 
 const productSpecSchema = new Schema<IProductSpec>(
@@ -38,6 +39,10 @@ const productSpecSchema = new Schema<IProductSpec>(
     },
     onlineDate: {
       type: Date,
+    },
+    isValid: {
+      type: Boolean,
+      default: true
     },
   },
   {

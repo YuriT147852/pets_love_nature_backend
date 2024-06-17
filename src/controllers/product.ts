@@ -2,10 +2,9 @@ import type { RequestHandler } from 'express';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductModel, { IProduct } from '@/models/product';
-import ProductSpecModel, { IProductSpec } from '@/models/productSpec';
-import { ICreateProduct, IShowProduct } from '@/types/product';
-import { PipelineStage } from 'mongoose';
-
+import ProductSpecModel from '@/models/productSpec';
+import { ICreateProduct, IShowProduct, IShowProductSpec } from '@/types/product';
+import { PipelineStage } from 'mongoose'
 interface MatchStage {
     [key: string]: {
         $regex?: RegExp;
@@ -19,9 +18,9 @@ type SortOrder = 1 | -1;
 // 不加篩選
 export const getProductList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
     const result = await ProductSpecModel.find({}).populate({
-        path: 'productId',
-        select: 'title subtitle description star category otherInfo imageGallery'
+        path: 'productId'
     });
+
     if (result.length === 0) {
         next(errorResponse(404, '無商品資料'));
         return;
@@ -37,8 +36,7 @@ export const getProductList: RequestHandler = handleErrorAsync(async (_req, res,
 export const getProductById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await ProductSpecModel.findOne({ _id: req.params.id })
         .populate({
-            path: 'productId',
-            select: 'id title subtitle description star category otherInfo imageGallery'
+            path: 'productId'
         }).lean(); // 使用 .lean() 提高查詢性能;
 
     if (!result) {
@@ -58,8 +56,9 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
         category: productInfo.category,
         otherInfo: productInfo.otherInfo,
         imageGallery: productInfo.imageGallery,
-        productSpecList: productSpecList as IProductSpec[], // 確保類型匹配
-        productNumber: productInfo.productNumber
+        productSpecList: productSpecList as IShowProductSpec[],
+        productNumber: productInfo.productNumber,
+        productId: productInfo._id
     };
 
     if (!finalResult) {
@@ -75,6 +74,7 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
     );
 });
 
+// 新增商品
 export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     // 1.先建立商品訊息
     const { title, subtitle, category, otherInfo, imageGallery, description, productSpecList }: ICreateProduct = req.body;
@@ -117,7 +117,7 @@ export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, 
     }
 });
 
-// 加篩選
+// 查詢前台篩選商品
 export const getFilterProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory } = req.query;
 
@@ -230,6 +230,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
 });
 
+// 刪除商品規格
 export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await ProductSpecModel.findByIdAndRemove(req.params.id);
     if (!result) {
@@ -244,37 +245,68 @@ export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req
     );
 });
 
-
 // 更新商品資訊
 export const updateProductById: RequestHandler = handleErrorAsync(async (req, res, next) => {
-
-    // 1.先建立商品訊息
+    let returnResult = '';
+    // 取得要更新的商品資訊
     const { productId, title, subtitle, category, otherInfo, imageGallery, description, productSpecList }: ICreateProduct = req.body;
-    if (!productId) {
-        next(errorResponse(404, '無商品資料'));
-        return;
+    if (productId) {
+        // 更新商品資訊
+        const updateProductInfo = await ProductModel.findByIdAndUpdate(
+            productId,
+            {
+                title,
+                subtitle,
+                category,
+                otherInfo,
+                imageGallery,
+                description
+            },
+            { new: true } // 返回更新後的文檔
+        );
+        returnResult = "資訊ID: " + updateProductInfo?._id;
+        if (!updateProductInfo) {
+            next(errorResponse(404, '欲更新的商品資訊ID不存在'));
+        }
+
+    } else {
+        // 無商品資訊
+        // 更新商品規格
+        if (productSpecList && productSpecList.length > 0) {
+            for (let i = 0; i < productSpecList.length; i++) {
+                const { id, productNumber, weight, price, inStock, onlineStatus } = productSpecList[i];
+                if (id) {
+                    // 更新現有的商品規格
+                    const uptProductSpec = await ProductSpecModel.findByIdAndUpdate(
+                        id,
+                        {
+                            productNumber,
+                            weight,
+                            price,
+                            inStock, onlineStatus
+                        },
+                        { new: true } // 返回更新後的文檔
+                    );
+                    if (uptProductSpec) {
+                        returnResult += "規格ID: " + uptProductSpec._id;
+                    }
+                    if (!uptProductSpec) {
+                        next(errorResponse(404, '欲更新的商品規格不存在'));
+                    }
+                }
+            }
+        }
+        res.status(200).json(
+            successResponse({
+                message: `成功更新商品: ${returnResult}`
+            }),
+        );
     }
-    // 2. 更新商品資訊
-    const resultProduct = await ProductModel.findByIdAndUpdate(
-        productId,
-        {
-            title,
-            subtitle,
-            category,
-            otherInfo,
-            imageGallery,
-            description
-        },
-        { new: true } // 返回更新後的文檔
-    );
-    if (!resultProduct) {
-        return next(errorResponse(404, "未找到商品資訊"));
-    }
-    const uptProductSpecList: IProductSpec[] = [];
-    // 3. 更新商品規格
+
+    // 更新商品規格
     if (productSpecList && productSpecList.length > 0) {
         for (let i = 0; i < productSpecList.length; i++) {
-            const { id, productNumber, weight, price, inStock } = productSpecList[i];
+            const { id, productNumber, weight, price, inStock, onlineStatus } = productSpecList[i];
             if (id) {
                 // 更新現有的商品規格
                 const uptProductSpec = await ProductSpecModel.findByIdAndUpdate(
@@ -283,29 +315,35 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
                         productNumber,
                         weight,
                         price,
-                        inStock
+                        inStock,
+                        onlineStatus
                     },
                     { new: true } // 返回更新後的文檔
                 );
-                if (uptProductSpec) uptProductSpecList.push(uptProductSpec);
-            } else {
-                // 如果沒有 _id，則創建新的商品規格
-                const newProductSpec = await ProductSpecModel.create({
-                    productId: id,
-                    productNumber,
-                    weight,
-                    price,
-                    inStock
-                });
-                if (newProductSpec) uptProductSpecList.push(newProductSpec);
+                if (uptProductSpec) {
+                    returnResult += "規格ID: " + uptProductSpec._id;
+                }
+                if (!uptProductSpec) {
+                    next(errorResponse(404, '欲更新的商品規格ID不存在'));
+                }
             }
+            // else {
+            //     // 如果沒有 _id，則創建新的商品規格
+            //     const newProductSpec = await ProductSpecModel.create({
+            //         productId: id,
+            //         productNumber,
+            //         weight,
+            //         price,
+            //         inStock, onlineStatus
+            //     });
+            //     if (newProductSpec) uptProductSpecList.push(newProductSpec);
+            // }
         }
     }
-    // console.log("uptProductSpecList: ", uptProductSpecList);
+
     res.status(200).json(
         successResponse({
-            message: `成功更新商品規格: ${uptProductSpecList.length} 筆`,
-            data: uptProductSpecList
+            message: `成功更新商品${returnResult}`
         }),
     );
 });

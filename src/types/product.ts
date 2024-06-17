@@ -6,8 +6,19 @@ import { IOtherInfo } from '@/models/schema/otherInfo';
 export interface ICreateProduct extends IProduct {
   productSpecList: [IProductSpec]
 }
+export interface IShowProductSpec {
+  id: string;
+  productNumber: string;
+  weight: number;
+  price: number;
+  inStock: number;
+  onlineStatus: boolean;
+  onlineDate: Date;
+  isValid: boolean;
+}
 
 export interface IShowProduct {
+  productId: string;
   title: string;
   subtitle: string;
   description: string;
@@ -16,5 +27,5 @@ export interface IShowProduct {
   category: string[];
   otherInfo: IOtherInfo[];
   imageGallery: IImageGallery[];
-  productSpecList: IProductSpec[];
+  productSpecList: IShowProductSpec[];
 }

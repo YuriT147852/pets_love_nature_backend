@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as ProductController from '@/controllers/product';
+import { Back_isAuth } from '@/utils/isAuth';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.get(
             schema: {
                 "status": "true",
                 "result": [
-                    { $ref: '#/definitions/ProductResponses' }
+                    { $ref: '#/definitions/ProductListResponses' }
                 ]
             }
         }
@@ -75,7 +76,7 @@ router.post(
                                 "altText": "狗鮮食"
                             }
                         ],
-                    }
+                        }            
         }
      * #swagger.responses[404] = {
             schema:             {
@@ -84,7 +85,7 @@ router.post(
             }
         }
      */
-    '',
+    '', Back_isAuth,
     ProductController.createOneOrder
 );
 
@@ -102,20 +103,7 @@ router.patch(
                 "subtitle": "新鮮雞胸肉，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素",
                 "category": ["dry", "fresh", "cat", "dog"],
                 "otherInfo": [{ "infoName": "產地", "infoValue": "台灣" }],
-                "productSpecList": [
-                    {
-                        "id": "",
-                        "weight": 50,
-                        "price": 60,
-                        "inStock": 50,
-                    },
-                    {
-                        "id": "",
-                        "weight": 200,
-                        "price": 180,
-                        "inStock": 50,
-                    }
-                ],
+                "description": " <p>\n          24h 快速出貨:fire:<br>\n          :smiley_cat:貓肉泥主食罐:dog:<br>\n          嚴選人食等級肉品，100%純天然健康、絕無添加！<br>!!照護毛孩健康是我們的本份:sparkling_heart:我們的包裝簡約卻充滿溫暖，用心經營每一個細節，只為了將成本降至最低，讓品質卻提升至最高，將這份愛與呵護，完美呈現在毛孩的每一餐中:heart_eyes:\n          TW台灣加工廠直售，我們與您攜手守護毛孩的健康，原料、加工到包裝一條龍作業全都在台灣在地生產製作:fire:\n          如有相關問題歡迎聊聊~小編竭盡所能&盡快的回覆🫶️※ 小編回覆時間為9:00~小編愛睏為止:relieved:\n          ⚠近期繁多包裹詐騙⚠突如其來的貨到付款...等手法!!請家長們再三確認訂單系統通知:fire:為了預防詐騙:fire:建議使用信用卡付款、轉帳付款。\n        </p>",
                 "imageGallery": 
                         [
                             {
@@ -123,7 +111,23 @@ router.patch(
                                 "altText": "狗鮮食"
                             }
                         ],
+                "productSpecList": [
+                    {
+                        "id": "",
+                        "weight": 50,
+                        "price": 60,
+                        "inStock": 50,
+                        "onlineStatus": false
+                    },
+                    {
+                        "id": "",
+                        "weight": 200,
+                        "price": 180,
+                        "inStock": 50,
+                        "onlineStatus": false
                     }
+                ]                    
+            }
         }
      * #swagger.responses[200] = {
             schema: {
@@ -134,18 +138,18 @@ router.patch(
      * #swagger.responses[404] = {
             schema: {
                 "status": "false",
-                "message": "商品規格不存在",
+                "message": "商品規格ID不存在/商品資訊ID不存在",
             }
         }
      */
-    '',
+    '/updateProductById', Back_isAuth,
     ProductController.updateProductById
 );
 
 // 刪除商品規格
 router.delete(
     /**
-     * #swagger.description  = "刪除商品規格" 
+     * #swagger.description= "刪除商品規格" 
      * #swagger.security=[{"Bearer": []}]
      * #swagger.responses[200] = {
             schema: {
@@ -155,12 +159,12 @@ router.delete(
         }
      * #swagger.responses[404] = {
             schema: {
-                status": "false",
+                "status": "false",
                 "message": "商品規格不存在",
             }
         }
      */
-    '/:id',
+    '/:id', Back_isAuth,
     ProductController.deleteProductSpecById
 );
 
