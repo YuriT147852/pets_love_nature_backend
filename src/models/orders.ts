@@ -46,7 +46,7 @@ const orderProductSchema = new Schema<OrderProduct>(
         productId: { type: Schema.Types.ObjectId, required: [true, '購買商品清單ID未填寫'], ref: 'product' },
         price: { type: Number, required: [true, '購買商品清單price未填寫'] },
         quantity: { type: Number, required: [true, '購買商品清單quantity未填寫'] },
-        productTitle: { type: String, required: [true, '購買商品清單quantity未填寫'] },
+        productTitle: { type: String, required: [true, '購買商品清單productTitle未填寫'] },
         coverImg: { type: String, required: [true, '購買商品清單coverImg未填寫'] }
     },
     { _id: false }
