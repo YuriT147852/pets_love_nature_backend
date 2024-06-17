@@ -304,7 +304,7 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     }
 
     //成功就更新狀態
-    await OrderModel.updateOne({ _id: orderId }, { orderId: 1 });
+    await OrderModel.updateOne({ _id: orderId }, { orderStatus: 1 });
 
     //先抓
     const userId = result.userId;
