@@ -9,6 +9,7 @@ import { PaymentResponse } from '@/types/payment';
 import OpenAI from 'openai';
 import shoppingCartModel from '@/models/shoppingCart';
 import { Customer } from '@/models/customer';
+import mongoose from 'mongoose';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await OrderModel.find(
@@ -308,9 +309,11 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
 
     //先抓
     const userId = result.userId;
+    // 确保 userId 是 ObjectId 类型
+    const objectId = typeof userId === 'string' ? new mongoose.Types.ObjectId(userId) : userId;
 
     //把購物車裡shoppingCart是TRUE刪掉
-    await shoppingCartModel.updateMany({ customerId: userId }, { $pull: { shoppingCart: { isChoosed: true } } });
+    await shoppingCartModel.updateMany({ customerId: objectId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
     res.status(200).json(
         successResponse({

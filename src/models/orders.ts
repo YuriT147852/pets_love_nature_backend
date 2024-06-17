@@ -1,5 +1,5 @@
 import { Customer } from '@/models/customer';
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
 export interface DeliveryAddress {
     country: string;
@@ -15,7 +15,7 @@ export interface OrderProduct {
 }
 
 interface Order extends Document {
-    userId: Customer | Types.ObjectId;
+    userId: Customer | Schema.Types.ObjectId;
     orderProductList: OrderProduct[];
     orderDate: Date;
     orderStatus: number;
