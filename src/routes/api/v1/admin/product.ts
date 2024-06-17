@@ -86,8 +86,43 @@ router.post(
         }
      */
     '', Back_isAuth,
-    ProductController.createOneOrder
+    ProductController.createProduct
 );
+
+// 新增商品規格
+router.post(
+    /**
+     * #swagger.description  = "新增已有商品資訊的商品規格"
+     * #swagger.security=[{"Bearer": []}]
+          * #swagger.parameters['body'] = {
+            in: 'body',
+            required: true,
+            schema: {
+                "productId": "661a9a9fa892ea2a81234567",
+                "productSpecList": [
+                    {
+                        "weight": 50,
+                        "price": 60,
+                        "inStock": 50,
+                    },
+                    {
+                        "weight": 200,
+                        "price": 180,
+                        "inStock": 50,
+                    }
+                ]           
+        }
+     * #swagger.responses[404] = {
+            schema:             {
+                "status": "false",
+                "message": "欄位錯誤",
+            }
+        }
+     */
+    '/createProductSpec', Back_isAuth,
+    ProductController.createProductSpec
+);
+
 
 // 修改商品
 router.patch(

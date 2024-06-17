@@ -76,7 +76,7 @@ export const getProductById: RequestHandler = handleErrorAsync(async (req, res, 
 });
 
 // 新增商品
-export const createOneOrder: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+export const createProduct: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     // 1.先建立商品訊息
     const { title, subtitle, category, otherInfo, imageGallery, description, productSpecList }: ICreateProduct = req.body;
 
@@ -334,17 +334,6 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
                     next(errorResponse(404, '欲更新的商品規格ID不存在'));
                 }
             }
-            // else {
-            //     // 如果沒有 _id，則創建新的商品規格
-            //     const newProductSpec = await ProductSpecModel.create({
-            //         productId: id,
-            //         productNumber,
-            //         weight,
-            //         price,
-            //         inStock, onlineStatus
-            //     });
-            //     if (newProductSpec) uptProductSpecList.push(newProductSpec);
-            // }
         }
     }
 
@@ -355,3 +344,47 @@ export const updateProductById: RequestHandler = handleErrorAsync(async (req, re
     );
 });
 
+// 單獨新增商品規格
+export const createProductSpec: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { productId, productSpecList }: ICreateProduct = req.body;
+    if (!productId) {
+        next(errorResponse(404, '請填寫商品資訊ID'));
+        return;
+    }
+    if (productSpecList.length <= 0) {
+        next(errorResponse(404, '請新增商品規格'));
+        return;
+    }
+    const resultProduct = await ProductModel.findOne({ _id: productId });
+    if (!resultProduct) {
+        next(errorResponse(404, '無商品資訊ID'));
+        return;
+    }
+    let returnResult = "";
+    for (let i = 0; i < productSpecList.length; i++) {
+        const productNumber = productSpecList[i].productNumber;
+        const weight = productSpecList[i].weight;
+        const price = productSpecList[i].price;
+        const inStock = productSpecList[i].inStock;
+
+        // 2.建立商品規格
+        const resultProductSpec = await ProductSpecModel.create({
+            productId,
+            productNumber,
+            weight,
+            price,
+            inStock
+        });
+
+        await resultProductSpec.populate({
+            path: 'productId'
+        });
+        returnResult += resultProductSpec._id + " ";
+    }
+
+    res.status(200).json(
+        successResponse({
+            message: '成功建立商品規格ID: ' + returnResult + ' 成功建立 '
+        }),
+    );
+});

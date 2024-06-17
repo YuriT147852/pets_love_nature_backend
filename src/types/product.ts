@@ -4,6 +4,7 @@ import { IImageGallery } from '@/models/schema/imageGallery';
 import { IOtherInfo } from '@/models/schema/otherInfo';
 
 export interface ICreateProduct extends IProduct {
+  productId: string;
   productSpecList: [IProductSpec]
 }
 export interface IShowProductSpec {
