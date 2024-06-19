@@ -1,6 +1,7 @@
 import swaggerAutogen from 'swagger-autogen';
 import path from 'path';
-
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('swagger-autogen:', swaggerAutogen);
 const doc = {
     info: {
         title: '寵愛天然 | 六角學院北11組專題',
@@ -173,7 +174,6 @@ const doc = {
 
 const outputFile = `${path.resolve()}/develop/swagger_output.json`;
 
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('swagger-autogen:', swaggerAutogen);
+
 
 swaggerAutogen(outputFile, ['src/app/index.ts'], doc);
