@@ -29,6 +29,8 @@ interface Order extends Document {
     deliveryDate?: Date;
     deliveryAmount: number;
     doneDate?: Date;
+    deliveryEmail: string;
+    deliveryPhone: string;
 }
 
 const deliveryaddressSchema = new Schema<DeliveryAddress>(
@@ -65,7 +67,9 @@ const orderSchema = new Schema<Order>(
         note: { type: String, default: '' },
         deliveryDate: { type: Date },
         deliveryAmount: { type: Number },
-        doneDate: { type: Date }
+        doneDate: { type: Date },
+        deliveryEmail: { type: String, required: [true, 'Email未填寫'] },
+        deliveryPhone: { type: String, required: [true, 'Phone未填寫'] }
     },
     {
         versionKey: false,
