@@ -1,4 +1,4 @@
-import swaggerAutogenous from 'swagger-autogen';
+import swaggerAutogen from 'swagger-autogen';
 import path from 'path';
 
 const doc = {
@@ -173,4 +173,7 @@ const doc = {
 
 const outputFile = `${path.resolve()}/develop/swagger_output.json`;
 
-swaggerAutogenous(outputFile, ['src/app/index.ts'], doc);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('swagger-autogen:', swaggerAutogen);
+
+swaggerAutogen(outputFile, ['src/app/index.ts'], doc);
