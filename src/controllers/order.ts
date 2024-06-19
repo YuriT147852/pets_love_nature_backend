@@ -216,9 +216,19 @@ const { MerchantID, Version, PayGateWay, NotifyUrl, ReturnUrl } = process.env;
 export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const item = req.body as PaymentItem;
 
-    const { Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName } = item;
+    const { Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName, deliveryPhone } = item;
 
-    if (!Email || !Amt || !ItemDesc || !userId || !orderProductList || !deliveryAddress || !deliveryUserName) {
+    if (
+        !Email ||
+        !Amt ||
+        !ItemDesc ||
+        !userId ||
+        !orderProductList ||
+        !deliveryAddress ||
+        !deliveryUserName ||
+        !deliveryPhone
+    ) {
+        console.log(Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName, deliveryPhone);
         next(errorResponse(400, 'body參數錯誤'));
         return;
     } else if (orderProductList.length === 0) {
@@ -232,7 +242,9 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
         orderProductList,
         deliveryAddress,
         orderStatus: -3,
-        deliveryUserName
+        deliveryUserName,
+        deliveryEmail: Email,
+        deliveryPhone
     });
 
     //需要一個時間戳
