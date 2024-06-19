@@ -44,7 +44,7 @@ declare global {
             //Ai
             OPEN_AI_API_KEY: string;
 
-            NODE_ENV: 'development' | 'production';
+            NODE_ENV: 'production' | 'development';
         }
     }
 
