@@ -27,7 +27,7 @@ router.get(
          }
      }
  */
-    '/',
+    '',
     Back_isAuth,
     BannerController.getBanner
 );
@@ -78,7 +78,7 @@ router.post(
         }
     }
  */
-    '/',
+    '',
     Back_isAuth,
     BannerController.addBanner);
 
