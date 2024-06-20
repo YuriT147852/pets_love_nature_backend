@@ -16,7 +16,7 @@ export interface OrderProduct {
     coverImg: string;
 }
 
-interface Order extends Document {
+export interface Order extends Document {
     userId: Customer | Schema.Types.ObjectId;
     orderProductList: OrderProduct[];
     orderDate: Date;
