@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "tsx watch src/app/index.ts",
-        "build": "node develop/build.js",
+        "build": "tsc &&  node develop/build.js",
         "start": "node dist/index.js",
         "swagger-autogen": "node develop/swagger.js",
         "postinstall": "npm run swagger-autogen",
