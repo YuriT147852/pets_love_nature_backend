@@ -60,6 +60,8 @@ export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, re
         message: message,
         stack: err.stack
       });
+      console.log(err.stack);
+
       return;
     }
 
