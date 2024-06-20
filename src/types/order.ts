@@ -8,6 +8,7 @@ export interface PaymentItem {
     deliveryUserName: string;
     orderProductList: OrderProduct[];
     deliveryAddress: DeliveryAddress;
+    deliveryPhone: string;
 }
 
 export interface ResPaymentItem {
