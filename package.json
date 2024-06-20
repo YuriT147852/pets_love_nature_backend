@@ -39,6 +39,7 @@
         "typescript-eslint": "^7.7.1"
     },
     "dependencies": {
+        "@types/multer": "^1.4.11",
         "@types/socket.io": "^3.0.2",
         "axios": "^1.6.8",
         "bcryptjs": "^2.4.3",
