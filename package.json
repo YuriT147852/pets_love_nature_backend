@@ -60,7 +60,8 @@
         "socket.io": "^4.7.5",
         "swagger-autogen": "^2.23.7",
         "swagger-ui-express": "^5.0.0",
-        "validator": "^13.11.0"
+        "validator": "^13.11.0",
+        "esbuild": "0.19.5"
     },
     "engines": {
         "node": ">=18"
