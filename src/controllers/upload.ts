@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 const bucket = firebaseAdmin.storage().bucket()
 export const uploadFile: RequestHandler = handleErrorAsync((req, res, _next) => {
   // 取得上傳的檔案資訊
-  const file = req.file as Express.Multer.File
+  const file = req.file
   if (!file) {
     errorResponse(400, '未找到檔案')
   }

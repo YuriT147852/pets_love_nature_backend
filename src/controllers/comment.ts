@@ -132,8 +132,8 @@ export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (r
 });
 
 // 取得消費者未評論的該筆訂單及商品資訊
-export const getComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
-  const { customerId, orderId } = req.params;
+export const getComment: RequestHandler = handleErrorAsync(async (_req, res, next) => {
+  // const { customerId, orderId } = req.params;
   const result = await CommentModel.find({});
   if (result.length === 0) {
     next(errorResponse(404, '無評論資料'));
