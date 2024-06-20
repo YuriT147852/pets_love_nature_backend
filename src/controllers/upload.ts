@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express';
-import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
+import { errorResponse, handleErrorAsync, MulterRequest } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
 
 const bucket = firebaseAdmin.storage().bucket()
-export const uploadFile: RequestHandler = handleErrorAsync((req, res, next) => {
+export const uploadFile: RequestHandler = handleErrorAsync((req: MulterRequest, res, next) => {
   // 取得上傳的檔案資訊
   const file = req.file;
   if (!file) {
