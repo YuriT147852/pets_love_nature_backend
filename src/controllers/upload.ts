@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { errorResponse } from '@/utils/errorHandler';
+import { Request, RequestHandler } from 'express';
+import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,7 +9,8 @@ interface MulterRequest extends Request {
 }
 
 const bucket = firebaseAdmin.storage().bucket()
-export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
+// export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
+export const uploadFile: RequestHandler = handleErrorAsync((req, res, next) => {
   // 取得上傳的檔案資訊
   const file = (req as MulterRequest).file;
   if (!file) {
@@ -52,4 +53,4 @@ export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   // 將檔案的 buffer 寫入 blobStream
   blobStream.end(file.buffer)
 
-};
+});
