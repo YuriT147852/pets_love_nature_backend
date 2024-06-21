@@ -1,11 +1,11 @@
-import { RequestHandler } from 'express';
-import { errorResponse, handleErrorAsync, MulterRequest } from '@/utils/errorHandler';
+import { NextFunction, Request, Response } from 'express';
+import { errorResponse } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
 
 const bucket = firebaseAdmin.storage().bucket()
-export const uploadFile: RequestHandler = handleErrorAsync((req: MulterRequest, res, next) => {
+export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   // 取得上傳的檔案資訊
   const file = req.file;
   if (!file) {
@@ -48,5 +48,4 @@ export const uploadFile: RequestHandler = handleErrorAsync((req: MulterRequest, 
   // 將檔案的 buffer 寫入 blobStream
   blobStream.end(file.buffer)
 
-});
-
+};
