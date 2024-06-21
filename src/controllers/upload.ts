@@ -5,9 +5,9 @@ import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
 
 const bucket = firebaseAdmin.storage().bucket()
-export const uploadFile = (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+export const uploadFile = (req: Request<any, any, any, any, Record<string, any>>, res: Response, next: NextFunction) => {
   // 取得上傳的檔案資訊
-  const file = req.file
+  const file = req.file as any
   if (!file) {
     return next(errorResponse(400, '未找到檔案'));
   }
