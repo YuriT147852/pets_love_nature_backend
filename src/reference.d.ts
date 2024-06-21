@@ -52,10 +52,8 @@ declare global {
     namespace Express {
         interface Request {
             user?: IUser | undefined;
+            file?: Multer.File | undefined;
         }
-    }
-
-    namespace Express {
         namespace Multer {
             /** Object containing file metadata and access information. */
             interface File {
@@ -87,21 +85,6 @@ declare global {
                 /** `MemoryStorage` only: A Buffer containing the entire file. */
                 buffer: Buffer;
             }
-        }
-
-        interface Request {
-            /** `Multer.File` object populated by `single()` middleware. */
-            file?: Multer.File | undefined;
-            /**
-             * Array or dictionary of `Multer.File` object populated by `array()`,
-             * `fields()`, and `any()` middleware.
-             */
-            files?:
-            | {
-                [fieldname: string]: Multer.File[];
-            }
-            | Multer.File[]
-            | undefined;
         }
     }
 }
