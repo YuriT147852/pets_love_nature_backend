@@ -1,18 +1,19 @@
-import { Request, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import firebaseAdmin from '@/service/firebase'
 import { v4 as uuidv4 } from 'uuid'
 
-interface MulterRequest extends Request {
-  file: any;
-}
+// interface MulterRequest extends Request {
+//   file: any;
+// }
 
 const bucket = firebaseAdmin.storage().bucket()
 // export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
 export const uploadFile: RequestHandler = handleErrorAsync((req, res, next) => {
   // 取得上傳的檔案資訊
-  const file = (req as MulterRequest).file;
+  // const file = (req as MulterRequest).file;
+  const file = req.file as Express.Multer.File
   if (!file) {
     return next(errorResponse(400, '未找到檔案'));
   }
