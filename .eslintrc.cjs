@@ -1,10 +1,5 @@
 module.exports = {
-    extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'prettier'
-    ],
+    extends: ['plugin:@typescript-eslint/recommended', 'prettier/recommended'],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         tsconfigRootDir: __dirname,
