@@ -1,9 +1,5 @@
-import { Request, RequestHandler, ErrorRequestHandler } from 'express';
+import { RequestHandler, ErrorRequestHandler } from 'express';
 import { handleNPMError } from './handleNPMError';
-
-export interface MulterRequest extends Request {
-  file?: Express.Multer.File;
-}
 
 interface CustomError extends Error {
   status: string;
