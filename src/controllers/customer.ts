@@ -6,6 +6,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { generateToken } from '@/utils/index';
 import CustomerModel from '@/models/customer';
 import ChatModel from '@/models/chat';
+import { IShowAccountStatus } from '@/types/customer';
 
 const app = express();
 
@@ -201,3 +202,33 @@ export const updateInfo: RequestHandler = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updateAccountStatus: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { AccountStatus, ids }: IShowAccountStatus = req.body;
+
+    if (!Array.isArray(ids) || !ids) {
+        next(errorResponse(400, 'ids格式錯誤'));
+        return;
+    } else if (ids.length === 0) {
+        next(errorResponse(400, 'ids長度必須大於0'));
+        return;
+    } else if (AccountStatus === undefined) {
+        next(errorResponse(400, 'AccountStatus格式錯誤'));
+        return;
+    }
+
+    for (let i = 0; i < ids.length; i++) {
+        await CustomerModel.updateMany(
+            {
+                _id: ids[i]
+            },
+            { accountStatus: AccountStatus }
+        );
+    }
+
+    res.status(200).json(
+        successResponse({
+            message: '修改帳號狀態成功'
+        })
+    );
+});
