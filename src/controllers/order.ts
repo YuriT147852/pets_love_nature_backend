@@ -188,7 +188,14 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             res.status(200).json(
                 successResponse({
                     message: '沒有該筆訂單',
-                    data: []
+                    data: {
+                        OrderData: [],
+                        page: {
+                            nowPage: page,
+                            totalPages: 0,
+                            totalDocuments: 0
+                        }
+                    }
                 })
             );
         }
