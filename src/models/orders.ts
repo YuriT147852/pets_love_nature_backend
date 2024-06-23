@@ -17,7 +17,7 @@ export interface OrderProduct {
     weight: number;
 }
 
-interface Order extends Document {
+export interface Order extends Document {
     userId: Customer | Schema.Types.ObjectId;
     orderProductList: OrderProduct[];
     orderDate: Date;

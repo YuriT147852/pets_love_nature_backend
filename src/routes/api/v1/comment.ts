@@ -18,31 +18,31 @@ router.get(
             }
         }
      */
-    '/getAllCommentList',
+    '',
     CommentController.getAllCommentList
 );
 
 // 取得單一商品資訊的評論
-// router.get(
-//     /**
-//      * #swagger.description  = "取得單一商品資訊的評論"
-//      * #swagger.parameters['productId'] = { description: '商品ID' }
-//      * #swagger.responses[200] = {
-//             schema: {
-//                 "status": "true",
-//                 "result": { $ref: '#/definitions/CommentResponses' }
-//             }
-//         }
-//      * #swagger.responses[404] = {
-//             schema: {
-//                 "status": "false",
-//                 "message": "此商品不存在",
-//             }
-//         }
-//      */
-//     '/getFilterCommentList/:productId',
-//     CommentController.getFilterCommentList
-// );
+router.get(
+    /**
+     * #swagger.description  = "取得單一商品資訊的評論"
+     * #swagger.parameters['productId'] = { description: '商品ID' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "result": { $ref: '#/definitions/CommentResponses' }
+            }
+        }
+     * #swagger.responses[404] = {
+            schema: {
+                "status": "false",
+                "message": "此商品不存在",
+            }
+        }
+     */
+    '/:productId',
+    CommentController.getFilterCommentList
+);
 
 /** 消費者端 */
 // 新增評論
@@ -74,41 +74,44 @@ router.post(
 );
 
 // 取得消費者未評論的訂單列表
-// router.get(
-//     /**
-//      * #swagger.description  = "取得消費者未評論的訂單列表"
-//      * #swagger.security=[{"Bearer": []}]
-//      * #swagger.responses[200] = {
-//             schema: {
-//                 "status": "true",
-//                 "result": [
-//                     { $ref: '#/definitions/CommentResponses' }
-//                 ]
-//             }
-//         }
-//      */
-//     '/getNoCommentOrderIdList',
-//     isAuth,
-//     CommentController.getNoCommentOrderIdList
-// );
+router.get(
+    /**
+     * #swagger.description  = "取得消費者未評論的訂單列表"
+     * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['customerId'] = { description: '消費者ID' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "result": [
+                    { $ref: '#/definitions/CommentResponses' }
+                ]
+            }
+        }
+     */
+    '/getNoCommentOrderIdList/:customerId',
+    isAuth,
+    CommentController.getNoCommentOrderIdList
+);
 
 // 取得消費者未評論的該筆訂單及商品資訊
-// router.get(
-//     /**
-//      * #swagger.description  = "取得消費者未評論的該筆訂單及商品資訊"
-//      * #swagger.security=[{"Bearer": []}]
-//      * #swagger.responses[200] = {
-//             schema: {
-//                 "status": "true",
-//                 "result": [
-//                     { $ref: '#/definitions/CommentResponses' }
-//                 ]
-//             }
-//         }
-//      */
-//     '/getComment/:orderId',
-//     isAuth,
-//     CommentController.getComment
-// );
+router.get(
+    /**
+     * #swagger.description  = "取得消費者未評論的該筆訂單及商品資訊"
+     * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['customerId'] = { description: '消費者ID' }
+     * #swagger.parameters['orderId'] = { description: '訂單ID' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "result": [
+                    { $ref: '#/definitions/CommentResponses' }
+                ]
+            }
+        }
+     */
+    '/getNoComment/:customerId/:orderId',
+    isAuth,
+    CommentController.getComment
+);
 
 export default router;

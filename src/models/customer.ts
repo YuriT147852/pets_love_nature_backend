@@ -78,6 +78,7 @@ const customerSchema = new Schema<Customer>(
         },
         accountStatus: {
             type: Number,
+            enum: [0, 1],
             default: 1
         }
     },

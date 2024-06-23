@@ -85,3 +85,20 @@ export const deleteBannerById: RequestHandler = handleErrorAsync(async (req, res
         })
     );
 });
+
+export const getFrontBanner: RequestHandler = handleErrorAsync(async (_req, res, _next) => {
+    const filter = {
+        $or: [
+            {
+                active: true
+            }
+        ]
+    };
+    const result = await bannerModel.find(filter);
+    res.status(200).json(
+        successResponse({
+            message: '前台取得banner成功',
+            data: result
+        })
+    );
+});
