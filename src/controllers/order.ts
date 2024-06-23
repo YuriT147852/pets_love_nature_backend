@@ -11,17 +11,14 @@ import shoppingCartModel from '@/models/shoppingCart';
 import { Customer } from '@/models/customer';
 import mongoose from 'mongoose';
 
-export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await OrderModel.find(
         {
             userId: req.params.userId
         },
         { _id: true, orderDate: true, deliveryDate: true, orderAmount: true, orderStatus: true }
     );
-    if (result.length === 0) {
-        next(errorResponse(404, '消費者訂單不存在'));
-        return;
-    }
+
     res.status(200).json(
         successResponse({
             message: '取得消費者訂單成功',
@@ -30,14 +27,11 @@ export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, n
     );
 });
 
-export const getOrders: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getOrders: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await OrderModel.find({
         _id: req.params.orderId
     });
-    if (result.length === 0) {
-        next(errorResponse(404, '該訂單資訊不存在'));
-        return;
-    }
+
     res.status(200).json(
         successResponse({
             message: '取得訂單資訊成功',
@@ -47,7 +41,7 @@ export const getOrders: RequestHandler = handleErrorAsync(async (req, res, next)
 });
 
 export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { page, filterStatus, searchText, requestSame, searchType } = req.query;
+    const { page, filterStatus, searchText, requestSame, searchType, limit } = req.query;
 
     if (!page) {
         next(errorResponse(404, 'page 為必填'));
@@ -72,8 +66,8 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
         }
     }
 
-    //每頁5筆
-    const pageSize = 5;
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
     //大小排序
     const filter = filterStatus === '1' ? 1 : -1;
     const skip = (Number(page) - 1) * pageSize;
@@ -98,8 +92,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 orderStatus: item.orderStatus
             })),
             page: {
-                nowPage: page,
-                totalPages
+                nowPage: parseInt(page as string),
+                totalPages,
+                totalDocuments
             }
         };
 
@@ -131,8 +126,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             const resData = {
                 OrderData: [],
                 page: {
-                    nowPage: page,
-                    totalPages: 0
+                    nowPage: parseInt(page as string),
+                    totalPages: 0,
+                    totalDocuments: 0
                 }
             };
 
@@ -167,8 +163,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 orderStatus: item.orderStatus
             })),
             page: {
-                nowPage: page,
-                totalPages
+                nowPage: parseInt(page as string),
+                totalPages,
+                totalDocuments
             }
         };
 
@@ -186,6 +183,16 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             return;
         }
 
+        //先檢查有無id
+        if (!mongoose.Types.ObjectId.isValid(text)) {
+            res.status(200).json(
+                successResponse({
+                    message: '沒有該筆訂單',
+                    data: []
+                })
+            );
+        }
+
         const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate<{
             userId: Customer;
         }>({
@@ -199,7 +206,12 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 userId: item['userId'].id,
                 email: item['userId'].email,
                 orderStatus: item.orderStatus
-            }))
+            })),
+            page: {
+                nowPage: parseInt(page as string),
+                totalPages: 1,
+                totalDocuments: 1
+            }
         };
 
         res.status(200).json(
