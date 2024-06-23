@@ -191,7 +191,7 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                     data: {
                         OrderData: [],
                         page: {
-                            nowPage: page,
+                            nowPage: parseInt(page as string),
                             totalPages: 0,
                             totalDocuments: 0
                         }
