@@ -134,7 +134,7 @@ router.get(
      */
     '/openAi',
     Back_isAuth,
-    // apiLimiter,
+    apiLimiter,
     OrderController.getAiText
 );
 
