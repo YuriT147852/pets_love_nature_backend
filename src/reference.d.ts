@@ -1,6 +1,6 @@
 import { IUser } from '@/models/user';
 import { any } from 'joi';
-import global from 'multer';
+import multer from 'multer';
 
 declare global {
     namespace NodeJS {
