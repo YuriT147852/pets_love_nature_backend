@@ -14,6 +14,7 @@ export interface OrderProduct {
     quantity: number;
     productTitle: string;
     coverImg: string;
+    weight: number;
 }
 
 export interface Order extends Document {
@@ -49,7 +50,8 @@ const orderProductSchema = new Schema<OrderProduct>(
         price: { type: Number, required: [true, '購買商品清單price未填寫'] },
         quantity: { type: Number, required: [true, '購買商品清單quantity未填寫'] },
         productTitle: { type: String, required: [true, '購買商品清單productTitle未填寫'] },
-        coverImg: { type: String, required: [true, '購買商品清單coverImg未填寫'] }
+        coverImg: { type: String, required: [true, '購買商品清單coverImg未填寫'] },
+        weight: { type: Number, required: [true, '購買商品清單weight未填寫'] }
     },
     { _id: false }
 );
