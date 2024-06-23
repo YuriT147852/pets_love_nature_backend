@@ -193,7 +193,10 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     }
     // 如果上限狀態有值
     if (onlineStatus !== undefined) {
-        matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
+        // console.log("0623 onlineStatus:   ", typeof onlineStatus, onlineStatus);
+        const isOnline = onlineStatus === 'true';
+        matchStage['onlineStatus'] = { $eq: isOnline };
+        // matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
     }
 
     // 如果 matchStage 不是空對象，則添加 $match 階段
@@ -207,10 +210,10 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
-    console.log("aggregationPipeline: ", aggregationPipeline);
+    // console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-    console.log("result: ", result);
+    // console.log("result: ", result.length);
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
