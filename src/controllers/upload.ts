@@ -8,8 +8,7 @@ const bucket = firebaseAdmin.storage().bucket()
 // export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
 export const uploadFile: RequestHandler = handleErrorAsync((req, res, next) => {
   // 取得上傳的檔案資訊
-  // const file = (req as MulterRequest).file;
-  const file = req.file
+  const file = req.file;
   if (!file) {
     return next(errorResponse(400, '未找到檔案'));
   }
