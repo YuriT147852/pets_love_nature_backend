@@ -5,7 +5,6 @@ import CommentModel from '@/models/comment';
 import CustomerModel from '@/models/customer';
 import OrderModel from '@/models/orders';
 import ProductModel from '@/models/product';
-import { IShowOrder } from '@/types/order';
 
 
 // 取得所有商品的評論
@@ -107,8 +106,8 @@ export const createComment: RequestHandler = handleErrorAsync(async (req, res, n
 // 取得消費者未評論的訂單列表
 export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const { customerId } = req.params;
-  let orderIdList: string[] = [];
-  const resOrder: IShowOrder[] = await OrderModel.find({
+  let result = []
+  const resOrder = await OrderModel.find({
     userId: customerId
   });
   if (resOrder.length === 0) {
@@ -116,33 +115,47 @@ export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (r
   }
 
   const resComment = await CommentModel.find({
-    userId: customerId
+    customerId
   });
   if (resComment.length === 0) {
-    orderIdList = resOrder.map((order: IShowOrder) => order.id);
+    result = resOrder.map(x => x._id);
+    res.status(200).json(
+      successResponse({
+        message: '取得待評論的訂單列表',
+        data: result,
+      }),
+    );
   }
 
+  // 提取 resOrder 和 resComment 的 _id 和 orderId 屬性到兩個新陣列中
+  const orderIds = resOrder.map(order => order._id.toString()); // 將 ObjectId 轉換為字串
+  const commentOrderIds = resComment.map(comment => comment.orderId.toString()); // 將 ObjectId 轉換為字串
+  // 過濾掉目前訂單中 已評論過的訂單
+  const filteredOrderIds = orderIds.filter(orderId => !commentOrderIds.includes(orderId));
 
   res.status(200).json(
     successResponse({
       message: '取得待評論的訂單列表',
-      data: orderIdList,
+      data: filteredOrderIds,
     }),
   );
 });
 
 // 取得消費者未評論的該筆訂單及商品資訊
-export const getComment: RequestHandler = handleErrorAsync(async (_req, res, next) => {
-  // const { customerId, orderId } = req.params;
-  const result = await CommentModel.find({});
-  if (result.length === 0) {
-    next(errorResponse(404, '無評論資料'));
-    return;
+export const getComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
+  const { customerId, orderId } = req.params;
+  const resOrder = await OrderModel.find({
+    userId: customerId, _id: orderId
+  });
+
+  if (resOrder.length === 0) {
+    return next(errorResponse(404, '無訂單資料'));
   }
+
   res.status(200).json(
     successResponse({
-      message: '取得所有商品的評論成功',
-      data: result,
+      message: '成功取得評論',
+      data: resOrder,
     }),
   );
 });

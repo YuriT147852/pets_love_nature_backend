@@ -4,7 +4,7 @@ import { Back_isAuth } from '@/utils/isAuth';
 
 const router = Router();
 
-// 取得商品列表
+// 取得全部商品列表
 router.get(
     /**
      * #swagger.description  = "取得所有商品列表"
@@ -17,7 +17,7 @@ router.get(
             }
         }
      */
-    '',
+    '/all',
     ProductController.getProductList
 );
 
@@ -43,9 +43,10 @@ router.get(
     ProductController.getProductById
 );
 
+// 取得篩選條件商品列表
 router.get(
     /**
-     * #swagger.description  = "取得篩選條件商品列表"          
+     * #swagger.description  = "取得篩選條件商品列表"         
      * #swagger.parameters['onlineStatus'] = {
             required: false,
             description: '上線狀態',
@@ -71,8 +72,8 @@ router.get(
             }
         }
      */
-    '/getFilterProductList',
-    ProductController.getFilterProductList
+    '',
+    ProductController.getAdminProductList
 );
 
 // 新增商品
@@ -155,7 +156,6 @@ router.post(
     '/createProductSpec', Back_isAuth,
     ProductController.createProductSpec
 );
-
 
 // 修改商品
 router.patch(

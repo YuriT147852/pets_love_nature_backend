@@ -9,6 +9,7 @@ router.get(
     /**
      * #swagger.description  = "取得訂單清單"
      * #swagger.parameters['page'] = { description: '頁數', required: true,}
+     * #swagger.parameters['limit'] = { description: '一頁幾筆 預設10筆' }
      * #swagger.parameters['filterStatus'] = { description: '物流排序 1:小到大 / 0:大到小' }
      * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
      * #swagger.parameters['requestSame'] = { description: '完全一致  0:false/1:true' }
@@ -28,7 +29,8 @@ router.get(
                 ],
                 "page": {
                     "nowPage": "1",
-                    "totalPages": 2
+                    "totalPages": 2,
+                    "totalDocuments": 249
                 }
             },
             "message": "成功抓取訂單資訊"
