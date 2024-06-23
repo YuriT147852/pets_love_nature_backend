@@ -240,6 +240,128 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
 });
 
+// 查詢前台篩選商品
+export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory, onlineStatus } = req.query;
+
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
+    // 跳頁
+    const skip = (Number(page) - 1) * pageSize;
+    // 獲取總筆數
+    const totalDocuments = await ProductSpecModel.countDocuments();
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
+    // 排序
+    const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
+    // 依照傳入的變數置換排序項目
+    let sortField: Record<string, SortOrder> = {};
+    switch (sortBy) {
+        case 'star':
+            sortField = { 'product.star': sortOrderNumber };
+            break;
+        case 'price':
+            sortField = { 'price': sortOrderNumber };
+            break;
+        case 'updatedAt':
+            sortField = { 'product.updatedAt': sortOrderNumber };
+            break;
+        case 'productSalesQuantity':
+            // todo: 計算訂單內的商品銷售數量
+            // sortField = { 'updatedAt': sortOrderNumber };
+            break;
+        default:
+            sortField = { 'inStock': sortOrderNumber };
+    }
+
+    const aggregationPipeline: PipelineStage[] = [
+        // 組裝商品資訊
+        {
+            $lookup: {
+                from: 'products',            // 目标集合名
+                localField: 'productId',     // 本集合中用于匹配的字段
+                foreignField: '_id',         // 目标集合中用于匹配的字段
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0, // 排除_id字段
+                        }
+                    }
+                ],
+                as: 'product'               // 輸出名稱
+            }
+        },
+        {
+            $unwind: '$product'            // 展開成物件
+        },
+        {
+            $project: {
+                productId: 0, // 排除 productId
+            }
+        }
+    ];
+
+    // 創建一個空的 matchStage 物件
+    const matchStage: MatchStage = {};
+    // 如果有關鍵字，則設置匹配條件
+    if (searchText) {
+        const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
+        matchStage['product.title'] = { $regex: regex };
+    }
+    // 如果有分類，則也加入匹配條件
+    if (filterCategory) {
+        matchStage['product.category'] = { $in: [filterCategory] };
+    }
+    // 如果上限狀態有值
+    if (onlineStatus !== undefined) {
+        // console.log("0623 onlineStatus:   ", typeof onlineStatus, onlineStatus);
+        const isOnline = onlineStatus === 'true';
+        matchStage['onlineStatus'] = { $eq: isOnline };
+        // matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
+    }
+
+    // 如果 matchStage 不是空對象，則添加 $match 階段
+    if (Object.keys(matchStage).length > 0) {
+        aggregationPipeline.push({ $match: matchStage });
+    }
+
+    // 加入排序及分頁
+    aggregationPipeline.push(
+        { $sort: sortField },
+        { $skip: skip },                   // 跳過指定數量
+        { $limit: pageSize }               // 限制輸出數量
+    );
+    // console.log("aggregationPipeline: ", aggregationPipeline);
+
+    const result = await ProductSpecModel.aggregate(aggregationPipeline);
+    // console.log("result: ", result.length);
+    if (result.length === 0) {
+        res.status(200).json(
+            successResponse({
+                message: '無商品資料',
+                data: [],
+            }),
+        );
+    }
+    const resData = {
+        content: result,
+        page: {
+            // todo: 一直顯示所有商品數量
+            // totalAmount: totalDocuments,
+            nowPage: Number(page),
+            totalPages
+        }
+    }
+    res.status(200).json(
+        successResponse({
+            message: '取得商品資料成功',
+            data: resData,
+        }),
+    );
+
+});
+
 // 刪除商品規格
 export const deleteProductSpecById: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await ProductSpecModel.findByIdAndRemove(req.params.id);
