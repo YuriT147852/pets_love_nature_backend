@@ -412,45 +412,28 @@ export const getAiText: RequestHandler = handleErrorAsync(async (req, res, next)
         model: 'gpt-3.5-turbo-16k',
         messages: [
             {
-                // 環境與規則
                 role: 'system',
                 content: '你是一個電商賣家,賣各種寵物食品,需要生成文案'
             },
             {
-                // 代表用戶輸入,問題
                 role: 'user',
                 content: text
-            },
-            {
-                // 預期的助手回答
-                role: 'assistant',
-                content: '好的，請稍等，我將生成一段關於這個產品的文案。'
-            },
-            {
-                // 代表用戶進一步輸入或確認
-                role: 'user',
-                content: '好的，麻煩你了。'
             }
         ],
-        // 限制最大長度
-        // max_tokens: 150,
-        // 0~1 越大隨機性越大
+        max_tokens: 300,
         temperature: 0.7,
-        // 生成概率質量
         top_p: 0.9,
-        // 重複度
         frequency_penalty: 0,
-        // 新穎度
         presence_penalty: 0.6
     });
 
-    const ResText = chatCompletion.choices[0].message.content;
-    const AiText = ResText ? ResText.trim() : '';
+    let responseText = chatCompletion.choices[0].message.content;
+    responseText = responseText.replace(/\n/g, ' ');
 
     res.status(200).json(
         successResponse({
             message: '文案取得成功',
-            data: AiText
+            data: responseText
         })
     );
 });
