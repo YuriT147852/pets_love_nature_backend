@@ -29,7 +29,7 @@ router.get(
                 ],
                 "page": {
                     "nowPage": "1",
-                    "totalPages": 2
+                    "totalPages": 2,
                     "totalDocuments": 249
                 }
             },
