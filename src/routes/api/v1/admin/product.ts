@@ -81,7 +81,6 @@ router.post(
     /**
      * #swagger.description  = "新增商品"
      * #swagger.security=[{"Bearer": []}]
-     * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
           * #swagger.parameters['body'] = {
             in: 'body',
             required: true,
@@ -160,7 +159,7 @@ router.post(
 // 修改商品
 router.patch(
     /**
-     * #swagger.description  = "修改商品"
+     * #swagger.description  = "修改商品資訊或商品規格"
      * #swagger.security=[{"Bearer": []}]
      * #swagger.parameters['body'] = {
             in: 'body',
@@ -219,6 +218,7 @@ router.delete(
     /**
      * #swagger.description= "刪除商品規格" 
      * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['id'] = { description: '商品規格ID' }
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",
