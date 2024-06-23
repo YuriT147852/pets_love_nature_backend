@@ -1,5 +1,6 @@
 import { IUser } from '@/models/user';
 import { any } from 'joi';
+import Multer from 'multer';
 
 declare global {
     namespace NodeJS {
@@ -52,6 +53,7 @@ declare global {
     namespace Express {
         interface Request {
             user?: IUser | undefined;
+            file?: Multer.File;
         }
     }
 }
