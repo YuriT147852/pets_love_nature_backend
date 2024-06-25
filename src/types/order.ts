@@ -33,5 +33,4 @@ export interface ResPaymentItem {
 
 export interface IShowOrder extends Order {
     id: string;
-
 }
