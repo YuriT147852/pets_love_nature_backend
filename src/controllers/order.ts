@@ -257,6 +257,7 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
 
     //新增一筆訂單
     const resultOrder = await OrderModel.create({
+        orderAmount: Amt,
         userId,
         orderProductList,
         deliveryAddress,
