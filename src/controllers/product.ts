@@ -3,7 +3,7 @@ import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductModel, { IProduct } from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
-import { ICreateProduct, IShowProduct, IShowProductSpec } from '@/types/product';
+import { ICreateProduct, IProductList, IShowProduct, IShowProductSpec } from '@/types/product';
 import { PipelineStage } from 'mongoose'
 
 interface MatchStage {
@@ -18,18 +18,29 @@ type SortOrder = 1 | -1;
 
 // 不加篩選
 export const getProductList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
-    const result = await ProductSpecModel.find({}).populate({
-        path: 'productId'
-    });
+    const result = await ProductSpecModel.find({}).populate<{
+        productId: IProduct
+    }>("productId").exec();
 
     if (result.length === 0) {
         next(errorResponse(404, '無商品資料'));
         return;
     }
+
+    // 整理資料
+    const formattedResult: IProductList[] = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.productId._id; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
     res.status(200).json(
         successResponse({
             message: '取得商品資料成功',
-            data: result,
+            data: formattedResult,
         }),
     );
 });
@@ -173,11 +184,11 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         {
             $unwind: '$product'            // 展開成物件
         },
-        {
-            $project: {
-                productId: 0, // 排除 productId
-            }
-        }
+        // {
+        //     $project: {
+        //         productId: 0, // 排除 productId
+        //     }
+        // }
     ];
 
     // 創建一個空的 matchStage 物件
@@ -213,7 +224,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     // console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-    // console.log("result: ", result.length);
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
@@ -222,8 +232,22 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             }),
         );
     }
+
+    console.log("res", result);
+
+
+    // 整理資料
+    const formattedResult = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.product._id; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
     const resData = {
-        content: result,
+        content: formattedResult,
         page: {
             // todo: 一直顯示所有商品數量
             // totalAmount: totalDocuments,

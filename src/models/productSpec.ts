@@ -1,7 +1,8 @@
 import { Schema, model, type Document } from 'mongoose';
+import { IProduct } from './product';
 
 export interface IProductSpec extends Document {
-  productId: Schema.Types.ObjectId;
+  productId: Schema.Types.ObjectId | IProduct;
   productNumber: string;
   weight: number;
   price: number;

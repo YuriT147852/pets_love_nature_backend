@@ -26,7 +26,7 @@ router.get(
 router.get(
     /**
      * #swagger.description  = "取得單一商品資訊的評論"
-     * #swagger.parameters['productId'] = { description: '商品ID' }
+     * #swagger.parameters['productId'] = { description: '商品資訊ID' }
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",
