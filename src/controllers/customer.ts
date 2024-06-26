@@ -236,16 +236,7 @@ export const updateAccountStatus: RequestHandler = handleErrorAsync(async (req, 
 export const getCustomerList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const { page = 1, limit, sortOrder, sortBy, requestSame, search } = req.query;
 
-    // 默認 1 頁顯示 10 筆
-    const pageSize = limit ? parseInt(limit as string, 10) : 10;
-    // 獲取總筆數
-    const totalDocuments = await CustomerModel.countDocuments();
-    // 獲取總頁數
-    const totalPages = Math.ceil(totalDocuments / pageSize);
-    //跳過比數
-    const skip = (Number(page) - 1) * pageSize;
-    //大小排序
-    const filter = sortBy === '1' ? 1 : -1;
+    let searchObj = {};
 
     if (search) {
         const text: string = search as string;
@@ -253,22 +244,19 @@ export const getCustomerList: RequestHandler = handleErrorAsync(async (req, res,
         const regex = new RegExp(text);
         const filterRegex = { $regex: regex };
         const filterHandler = requestSame === '1' ? search : filterRegex;
-        const result = await CustomerModel.find({ email: filterHandler });
-
-        const resData = {
-            data: result,
-            page: {
-                totalPages: 1,
-                nowPage: 1
-            }
-        };
-        res.status(200).json(
-            successResponse({
-                message: '查看帳號列表成功',
-                data: resData
-            })
-        );
+        searchObj = { email: filterHandler };
     }
+
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
+    // 獲取總筆數
+    const totalDocuments = await CustomerModel.countDocuments(searchObj);
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+    //跳過比數
+    const skip = (Number(page) - 1) * pageSize;
+    //大小排序
+    const filter = sortBy === '1' ? 1 : -1;
 
     const sortOptions: Record<string, 1 | -1> = {};
 
@@ -283,13 +271,14 @@ export const getCustomerList: RequestHandler = handleErrorAsync(async (req, res,
         sortOptions['accountStatus'] = 1;
     }
 
-    const result = await CustomerModel.find().skip(skip).limit(pageSize).sort(sortOptions);
+    const result = await CustomerModel.find(searchObj).skip(skip).limit(pageSize).sort(sortOptions);
 
     const resData = {
         data: result,
         page: {
             totalPages,
-            nowPage: page
+            nowPage: page,
+            totalDocuments
         }
     };
 
