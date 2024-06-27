@@ -56,7 +56,7 @@ router.get(
      * #swagger.parameters['searchText'] = { description: '關鍵字' }
      * #swagger.parameters['filterCategory'] = { description: '分類；fresh、cat、dog、dry' }
      * #swagger.parameters['sortOrder'] = { description: '選擇排序方式，預設-1；-1 由大到小 / 1 由小到大' }
-     * #swagger.parameters['sortBy'] = { description: '以指定項目排序，預設評價；項目：評價：star，價格：price，更新時間：updatedAt' }
+     * #swagger.parameters['sortBy'] = { description: '以指定項目排序，預設評價；項目：評價：star，價格：price，更新時間：updatedAt；銷售量：salesVolume' }
      * #swagger.parameters['page'] = { description: '前往指定頁數，預設1' }
      * #swagger.parameters['limit'] = { description: '顯示筆數，預設10' }
      * #swagger.responses[200] = {

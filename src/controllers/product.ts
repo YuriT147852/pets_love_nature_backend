@@ -156,9 +156,8 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         case 'updatedAt':
             sortField = { 'product.updatedAt': sortOrderNumber };
             break;
-        case 'productSalesQuantity':
-            // todo: 計算訂單內的商品銷售數量
-            // sortField = { 'updatedAt': sortOrderNumber };
+        case 'salesVolume':
+            sortField = { 'product.salesVolume': sortOrderNumber };
             break;
         default:
             sortField = { 'inStock': sortOrderNumber };
@@ -291,9 +290,8 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         case 'updatedAt':
             sortField = { 'product.updatedAt': sortOrderNumber };
             break;
-        case 'productSalesQuantity':
-            // todo: 計算訂單內的商品銷售數量
-            // sortField = { 'updatedAt': sortOrderNumber };
+        case 'salesVolume':
+            sortField = { 'product.salesVolume': sortOrderNumber };
             break;
         default:
             sortField = { 'inStock': sortOrderNumber };

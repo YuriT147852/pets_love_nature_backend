@@ -268,6 +268,14 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
         deliveryPhone
     });
 
+    // 更新每個商品的銷售量
+    for (const item of resultOrder.orderProductList) {
+        const productId = item.productId;
+        await ProductModel.findByIdAndUpdate(productId, {
+            $inc: { salesVolume: item.quantity }
+        }).exec();
+    }
+
     //需要一個時間戳
     const TimeStamp = Math.round(new Date().getTime() / 1000);
 
@@ -342,21 +350,6 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
 
     //把購物車裡shoppingCart是TRUE刪掉
     await shoppingCartModel.updateMany({ customerId: objectId }, { $pull: { shoppingCart: { isChoosed: true } } });
-
-    try {
-
-
-        // 更新每個商品的銷售量
-        for (const item of result.orderProductList) {
-            const productId = item.productId;
-            await ProductModel.findByIdAndUpdate(productId, {
-                $inc: { salesVolume: item.quantity }
-            }).exec();
-        }
-    } catch (error) {
-        console.log("更新每個商品的銷售量: ", error);
-
-    }
 
     res.status(200).json(
         successResponse({
