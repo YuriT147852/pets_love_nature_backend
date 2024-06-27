@@ -10,6 +10,7 @@ import OpenAI from 'openai';
 import shoppingCartModel from '@/models/shoppingCart';
 import { Customer } from '@/models/customer';
 import mongoose from 'mongoose';
+import ProductModel from '@/models/product';
 
 export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await OrderModel.find(
@@ -342,6 +343,21 @@ export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, n
     //把購物車裡shoppingCart是TRUE刪掉
     await shoppingCartModel.updateMany({ customerId: objectId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
+    try {
+
+
+        // 更新每個商品的銷售量
+        for (const item of result.orderProductList) {
+            const productId = item.productId;
+            await ProductModel.findByIdAndUpdate(productId, {
+                $inc: { salesVolume: item.quantity }
+            }).exec();
+        }
+    } catch (error) {
+        console.log("更新每個商品的銷售量: ", error);
+
+    }
+
     res.status(200).json(
         successResponse({
             message: '成功抓取金流資訊',
@@ -438,3 +454,6 @@ export const getAiText: RequestHandler = handleErrorAsync(async (req, res, next)
         })
     );
 });
+
+
+

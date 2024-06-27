@@ -12,6 +12,7 @@ export interface IProduct extends Document {
   category: string[];
   otherInfo: IOtherInfo[];
   imageGallery: IImageGallery[];
+  salesVolume: number;
 }
 
 const productSchema = new Schema<IProduct>(
@@ -30,6 +31,7 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       default: 0
     },
+
     productNumber: {
       type: String
     },
@@ -41,7 +43,11 @@ const productSchema = new Schema<IProduct>(
     },
     imageGallery: {
       type: [imageGallerySchema]
-    }
+    },
+    salesVolume: {
+      type: Number,
+      default: 0
+    },
   },
   {
     versionKey: false,
