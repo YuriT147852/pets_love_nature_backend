@@ -6,7 +6,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { generateToken } from '@/utils/index';
 import CustomerModel from '@/models/customer';
 import ChatModel from '@/models/chat';
-import { IShowAccountStatus } from '@/types/customer';
+import { IShowAccountStatus, IShowAccountStatusByArray } from '@/types/customer';
 
 const app = express();
 
@@ -223,6 +223,30 @@ export const updateAccountStatus: RequestHandler = handleErrorAsync(async (req, 
                 _id: ids[i]
             },
             { accountStatus: AccountStatus }
+        );
+    }
+
+    res.status(200).json(
+        successResponse({
+            message: '修改帳號狀態成功'
+        })
+    );
+});
+
+export const updateAccountStatusByArray: RequestHandler = handleErrorAsync(async (req, res, next) => {
+    const { userData } = req.body as { userData: IShowAccountStatusByArray[] };
+
+    if (!Array.isArray(userData)) {
+        next(errorResponse(404, 'body資料錯誤'));
+        return;
+    }
+
+    for (let i = 0; i < userData.length; i++) {
+        await CustomerModel.updateOne(
+            {
+                _id: userData[i].id
+            },
+            { accountStatus: userData[i].AccountStatus }
         );
     }
 

@@ -25,8 +25,16 @@ router.patch(
         in: "body",
         required: true,
         schema:{
-            "ids":["663f12237a6dabc6203875f4","66436361c2ae643fc43bf18a"],
-            "AccountStatus": 1
+            userData:[
+                {
+                    id: "663f12237a6dabc6203875f4",
+                    "AccountStatus": 1
+                },
+                {
+                    id: "66436361c2ae643fc43bf18a",
+                    "AccountStatus": 0
+                },
+            ]
         }
     };
     * #swagger.responses[200] = {
@@ -38,7 +46,7 @@ router.patch(
      */
     '/customers',
     Back_isAuth,
-    CustomerController.updateAccountStatus
+    CustomerController.updateAccountStatusByArray
 );
 
 router.get(
