@@ -48,8 +48,9 @@ router.get(
                     "productId": "661a9a9fa892ea2a833a1009",
                     "price": 500,
                     "quantity": 123,
-                    "productTitle": "111",
-                    "coverImg": "aaa"
+                    "productTitle": "這是名稱",
+                    "coverImg": "https://imageUrl.com",
+                    "weight": 76
                     }
                 ],
                 "orderStatus": -3,
