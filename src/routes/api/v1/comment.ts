@@ -58,6 +58,7 @@ router.post(
                 "orderId": "666e983c8e72d5cb153de579",
                 "customerId": "663f12237a6dabc6203875f4",
                 "star": 4,
+                "quantity": 2,
                 "comment": "貓吃的非常喜歡"
                 }
         }
