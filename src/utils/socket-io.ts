@@ -115,7 +115,7 @@ export function connectSocketIO(server: HTTPServer) {
                 await ChatModel.findOneAndUpdate({ userId }, { $push: { messageList: newMessage } });
 
                 if (role === 'client') {
-                    io.emit('admin message', newMessage);
+                    io.emit('admin message', { ...newMessage, userId });
                 } else if (role === 'admin') {
                     io.to(userId).emit('message', newMessage);
                 }
