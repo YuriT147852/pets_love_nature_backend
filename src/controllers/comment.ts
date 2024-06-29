@@ -7,7 +7,7 @@ import OrderModel from '@/models/orders';
 import ProductModel from '@/models/product';
 
 
-// 取得所有商品的評論
+// 取得所有商品的評價
 export const getAllCommentList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
   const result = await CommentModel.find({}).populate({
     path: 'productId',
@@ -20,18 +20,18 @@ export const getAllCommentList: RequestHandler = handleErrorAsync(async (_req, r
   });
 
   if (result.length === 0) {
-    next(errorResponse(404, '無評論資料'));
+    next(errorResponse(404, '無評價資料'));
     return;
   }
   res.status(200).json(
     successResponse({
-      message: '取得所有商品的評論成功',
+      message: '取得所有商品的評價成功',
       data: result,
     }),
   );
 });
 
-// 取得單一商品資訊的評論
+// 取得單一商品資訊的評價
 export const getFilterCommentList: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const result = await CommentModel.find({ productId: req.params.productId }).populate({
     path: 'productId',
@@ -43,29 +43,35 @@ export const getFilterCommentList: RequestHandler = handleErrorAsync(async (req,
     path: 'orderId', select: '_id'
   });
   if (result.length === 0) {
-    next(errorResponse(404, '無評論資料'));
+    next(errorResponse(404, '無評價資料'));
     return;
   }
   res.status(200).json(
     successResponse({
-      message: '取得商品的評論成功',
+      message: '取得商品的評價成功',
       data: result,
     }),
   );
 });
 
-// 新增
+// 新增評價
 export const createComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const { customerId,
     productId,
     orderId,
-    star,
+    star, quantity,
     comment } = req.body;
 
   if (star <= 0) {
     return next(errorResponse(404, '請給予大於 0 的評價 '));
-
   }
+
+  // 訂單不可重複評價
+  const resComment = await CommentModel.findOne({ orderId, productId });
+  if (resComment) {
+    return next(errorResponse(404, '不可重複評價同筆訂單商品, 已建立評價ID: ' + resComment._id));
+  }
+
   const resCustomer = await CustomerModel.findOne({ _id: customerId });
   if (!resCustomer) {
     return next(errorResponse(404, '無此消費者ID: ' + customerId));
@@ -90,25 +96,37 @@ export const createComment: RequestHandler = handleErrorAsync(async (req, res, n
     comment
   });
 
-  // Populate all necessary fields
-  await result.populate({ path: 'customerId' });
-  await result.populate({ path: 'productId' });
-  await result.populate({ path: 'orderId' });
+  // 統計評價的分數去更新商品的評分(star)欄位
+  const productInfo = await ProductModel.findById(productId).exec(); // 查找当前商品的评分和销售量
+  const currentQuantity = quantity;
+  const currentStar = star;
+  const salesVolume = productInfo.salesVolume;
+  const historyStar = productInfo.star;
+
+  // 计算新的评分
+  const newStar = ((historyStar * salesVolume) + (currentStar * currentQuantity)) / (salesVolume + currentQuantity);
+
+  await ProductModel.findByIdAndUpdate(productId, {
+    star: newStar,
+  }).exec();
+
+  console.log("新增訂單 result: ", result);
+
 
   res.status(200).json(
     successResponse({
-      message: '建立評論成功',
-      data: result,
+      message: '建立評價成功, 商品資訊ID: ' + productId,
     }),
   );
 });
 
-// 取得消費者未評論的訂單列表
+// 取得消費者未評價的訂單列表
 export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const { customerId } = req.params;
   let result = []
+  // 訂單狀態要大於等於  已取貨，待評價 4 才可以被評價
   const resOrder = await OrderModel.find({
-    userId: customerId
+    userId: customerId, orderStatus: { $gte: 4 }
   });
   if (resOrder.length === 0) {
     return next(errorResponse(404, '無訂單資料'));
@@ -121,7 +139,7 @@ export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (r
     result = resOrder.map(x => x._id);
     res.status(200).json(
       successResponse({
-        message: '取得待評論的訂單列表',
+        message: '取得待評價的訂單列表',
         data: result,
       }),
     );
@@ -130,18 +148,19 @@ export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (r
   // 提取 resOrder 和 resComment 的 _id 和 orderId 屬性到兩個新陣列中
   const orderIds = resOrder.map(order => order._id.toString()); // 將 ObjectId 轉換為字串
   const commentOrderIds = resComment.map(comment => comment.orderId.toString()); // 將 ObjectId 轉換為字串
-  // 過濾掉目前訂單中 已評論過的訂單
+
+  // 過濾掉目前訂單中 已評價過的訂單
   const filteredOrderIds = orderIds.filter(orderId => !commentOrderIds.includes(orderId));
 
   res.status(200).json(
     successResponse({
-      message: '取得待評論的訂單列表',
+      message: '取得待評價的訂單列表',
       data: filteredOrderIds,
     }),
   );
 });
 
-// 取得消費者未評論的該筆訂單及商品資訊
+// 取得消費者未評價的該筆訂單及商品資訊
 export const getComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const { customerId, orderId } = req.params;
   const resOrder = await OrderModel.find({
@@ -154,7 +173,7 @@ export const getComment: RequestHandler = handleErrorAsync(async (req, res, next
 
   res.status(200).json(
     successResponse({
-      message: '成功取得評論',
+      message: '成功取得評價',
       data: resOrder,
     }),
   );

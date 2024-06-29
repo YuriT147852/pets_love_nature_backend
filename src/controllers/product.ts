@@ -232,15 +232,14 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         );
     }
 
-    console.log("res", result);
-
-
     // 整理資料
     const formattedResult = [];
     for (let i = 0; i < result.length; i++) {
         const productSpecRes = result[i];
+        console.log("productSpecRes", productSpecRes);
+
         const data = JSON.parse(JSON.stringify(productSpecRes))
-        data["productInfoId"] = productSpecRes.product._id; // 商品資訊ID
+        data["productInfoId"] = productSpecRes.productId; // 商品資訊ID
         data["productSpecId"] = productSpecRes._id; // 商品規格ID
         formattedResult.push(data);
     }
@@ -317,11 +316,11 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         {
             $unwind: '$product'            // 展開成物件
         },
-        {
-            $project: {
-                productId: 0, // 排除 productId
-            }
-        }
+        // {
+        //     $project: {
+        //         productId: 0, // 排除 productId
+        //     }
+        // }
     ];
 
     // 創建一個空的 matchStage 物件
@@ -357,7 +356,6 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
     // console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-    // console.log("result: ", result.length);
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
@@ -366,8 +364,19 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
             }),
         );
     }
+    // console.log("res", result);
+    // 整理資料
+    const formattedResult = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.productId; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
     const resData = {
-        content: result,
+        content: formattedResult,
         page: {
             // todo: 一直顯示所有商品數量
             // totalAmount: totalDocuments,
@@ -381,6 +390,7 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
             data: resData,
         }),
     );
+
 
 });
 
