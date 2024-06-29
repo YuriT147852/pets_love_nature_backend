@@ -447,6 +447,3 @@ export const getAiText: RequestHandler = handleErrorAsync(async (req, res, next)
         })
     );
 });
-
-
-
