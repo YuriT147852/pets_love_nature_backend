@@ -9,7 +9,11 @@ import mongoose from 'mongoose';
 let io: SocketIOServer;
 let token: string;
 export function connectSocketIO(server: HTTPServer) {
-    io = new SocketIOServer(server);
+    io = new SocketIOServer(server, {
+        cors: {
+            origin: '*'
+        }
+    });
 
     //驗證header
     io.use(async (socket, next) => {
@@ -105,7 +109,7 @@ export function connectSocketIO(server: HTTPServer) {
                     role,
                     read: false,
                     message,
-                    chatId: new mongoose.Types.ObjectId('661a9a9fa892ea2a833a1009')
+                    chatId: new mongoose.Types.ObjectId()
                 };
 
                 await ChatModel.findOneAndUpdate({ userId }, { $push: { messageList: newMessage } });
