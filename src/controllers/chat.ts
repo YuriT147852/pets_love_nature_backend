@@ -6,7 +6,7 @@ import { successResponse } from '@/utils/successHandler';
 //抓取單一使用者聊天室
 export const getChatHistory: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const result = await ChatModel.find({
-        _id: req.params.userId
+        userId: req.params.customerId
     });
 
     if (result.length === 0) {
