@@ -31,7 +31,7 @@ router.get(
                 }
         }
      */
-    '/getChatHistory/:userId',
+    '/getChatHistory/:customerId',
     ChatController.getChatHistory
 );
 
