@@ -159,9 +159,11 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         case 'salesVolume':
             sortField = { 'product.salesVolume': sortOrderNumber };
             break;
-        default:
+        case 'inStock':
             sortField = { 'inStock': sortOrderNumber };
+            break;
     }
+    sortField = Object.assign({}, sortField, { 'productId': -1 });
 
     const aggregationPipeline: PipelineStage[] = [
         // 組裝商品資訊
@@ -262,9 +264,9 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
 });
 
-// 查詢前台篩選商品
+// 查詢後台篩選商品
 export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
-    const { page = 1, searchText = '', sortOrder = -1, sortBy = 'star', limit, filterCategory, onlineStatus } = req.query;
+    const { page = 1, searchText = '', sortOrder = -1, sortBy, limit, filterCategory, onlineStatus } = req.query;
 
     // 默認 1 頁顯示 10 筆
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
@@ -292,9 +294,14 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         case 'salesVolume':
             sortField = { 'product.salesVolume': sortOrderNumber };
             break;
-        default:
+        case 'inStock':
             sortField = { 'inStock': sortOrderNumber };
+            break;
     }
+    sortField = Object.assign({}, sortField, { 'productId': -1 });
+
+    console.log("sortField: ", sortField);
+
 
     const aggregationPipeline: PipelineStage[] = [
         // 組裝商品資訊
@@ -353,7 +360,7 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
-    // console.log("aggregationPipeline: ", aggregationPipeline);
+    console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
     if (result.length === 0) {
