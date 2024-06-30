@@ -18,7 +18,7 @@ export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, _
             userId: req.params.userId
         },
         { _id: true, orderDate: true, deliveryDate: true, orderAmount: true, orderStatus: true }
-    );
+    ).sort({ orderDate: -1 });
 
     res.status(200).json(
         successResponse({
