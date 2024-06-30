@@ -7,6 +7,7 @@ import { generateToken } from '@/utils/index';
 import CustomerModel from '@/models/customer';
 import ChatModel from '@/models/chat';
 import { IShowAccountStatus, IShowAccountStatusByArray } from '@/types/customer';
+import { log } from 'console';
 
 const app = express();
 
@@ -294,8 +295,22 @@ export const getCustomerList: RequestHandler = handleErrorAsync(async (req, res,
         sortOptions['email'] = 1;
         sortOptions['accountStatus'] = 1;
     }
-
     const result = await CustomerModel.find(searchObj).skip(skip).limit(pageSize).sort(sortOptions);
+
+    // 使用 Promise.all 来并行处理所有的聊天查询
+    const chatQueries = result.map(customer => ChatModel.find({ customerId: customer._id }));
+    const chats = await Promise.all(chatQueries);
+
+    for (let i = 0; i < result.length; i++) {
+        const chat = chats[i];
+        result[i] = result[i].toObject();
+        if (chat.length !== 0) {
+            const unreadCount = chat[0].messageList.filter(msg => msg.role === 'client' && msg.read === false).length;
+            result[i]['unreadCount'] = unreadCount;
+        } else {
+            result[i]['unreadCount'] = 0;
+        }
+    }
 
     const resData = {
         data: result,
