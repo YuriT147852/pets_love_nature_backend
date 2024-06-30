@@ -7,7 +7,6 @@ import { generateToken } from '@/utils/index';
 import CustomerModel from '@/models/customer';
 import ChatModel from '@/models/chat';
 import { IShowAccountStatus, IShowAccountStatusByArray } from '@/types/customer';
-import { log } from 'console';
 
 const app = express();
 
