@@ -1,6 +1,6 @@
 export interface SocketUser {
     role: string;
-    userId: string;
+    customerId: string;
     customerName?: string;
 }
 
