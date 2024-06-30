@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import { Customer } from '@/models/customer';
 
 interface IMessage extends Document {
     role: 'admin' | 'client';
@@ -8,8 +9,8 @@ interface IMessage extends Document {
     chatId: Schema.Types.ObjectId;
 }
 
-interface IChatRoom extends Document {
-    customerId: Schema.Types.ObjectId;
+export interface IChatRoom extends Document {
+    customerId: Schema.Types.ObjectId | Customer;
     messageList: IMessage[];
 }
 
@@ -30,7 +31,7 @@ const MessageSchema = new Schema<IMessage>(
 // 聊天室的 Schema
 const ChatRoomSchema = new Schema<IChatRoom>(
     {
-        customerId: { type: Types.ObjectId, required: false },
+        customerId: { type: Types.ObjectId, required: false, ref: 'Customer' },
         messageList: { type: [MessageSchema], required: false }
     },
     {

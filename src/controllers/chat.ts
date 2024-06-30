@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
+import { handleErrorAsync } from '@/utils/errorHandler';
 import ChatModel from '@/models/chat';
 import { successResponse } from '@/utils/successHandler';
 

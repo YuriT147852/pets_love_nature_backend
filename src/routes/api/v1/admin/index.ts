@@ -86,7 +86,8 @@ router.get(
                                 "district": "信義區",
                                 "address": "快樂鎮1234號5樓"
                             },
-                            "recipientPhone": "0978071727"
+                            "recipientPhone": "0978071727",
+                            "unreadCount": 10
                         }
                     ],
                     "page": {
