@@ -4,12 +4,12 @@ interface IMessage extends Document {
     role: 'admin' | 'client';
     read: boolean;
     message: string;
-    userId: Schema.Types.ObjectId;
+    customerId: Schema.Types.ObjectId;
     chatId: Schema.Types.ObjectId;
 }
 
 interface IChatRoom extends Document {
-    userId: Schema.Types.ObjectId;
+    customerId: Schema.Types.ObjectId;
     messageList: IMessage[];
 }
 
@@ -30,7 +30,7 @@ const MessageSchema = new Schema<IMessage>(
 // 聊天室的 Schema
 const ChatRoomSchema = new Schema<IChatRoom>(
     {
-        userId: { type: Types.ObjectId, required: false },
+        customerId: { type: Types.ObjectId, required: false },
         messageList: { type: [MessageSchema], required: false }
     },
     {
