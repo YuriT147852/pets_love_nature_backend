@@ -33,7 +33,7 @@ export function connectSocketIO(server: HTTPServer) {
             // 第一次先驗證是否為後台管理員
             const user: SocketUser = {
                 role: 'admin',
-                userId: ''
+                customerId: ''
             };
 
             emitConnectStatus(socket, user);
@@ -56,7 +56,7 @@ export function connectSocketIO(server: HTTPServer) {
                 }
 
                 const user: SocketUser = {
-                    userId: decoded.userId,
+                    customerId: decoded.userId,
                     role: 'client',
                     customerName: result.customerName
                 };
@@ -74,20 +74,20 @@ export function connectSocketIO(server: HTTPServer) {
         //client加入個別房間
         socket.on('join room', async data => {
             try {
-                const { userId, role } = data as SocketUser;
+                const { customerId, role } = data as SocketUser;
 
-                if (!userId || role !== 'client') {
+                if (!customerId || role !== 'client') {
                     emitErrorMsg(socket, 'userId與role錯誤');
                     return;
                 }
 
-                const roomResult = await ChatModel.findOne({ userId });
+                const roomResult = await ChatModel.findOne({ customerId });
 
                 //如果不到就創一個新的
                 if (!roomResult) {
-                    await ChatModel.create({ userId, messageList: [] });
+                    await ChatModel.create({ customerId, messageList: [] });
                 }
-                await socket.join(userId);
+                await socket.join(customerId);
             } catch (error) {
                 emitErrorMsg(socket, '加入房間失敗');
             }
@@ -96,9 +96,9 @@ export function connectSocketIO(server: HTTPServer) {
         //傳訊息
         socket.on('message', async data => {
             try {
-                const { message, userId, role } = data as SocketMsg;
+                const { message, customerId, role } = data as SocketMsg;
 
-                const status = DataHandler(userId, role);
+                const status = DataHandler(customerId, role);
 
                 if (!status.status) {
                     emitErrorMsg(socket, status.message);
@@ -112,12 +112,12 @@ export function connectSocketIO(server: HTTPServer) {
                     chatId: new mongoose.Types.ObjectId()
                 };
 
-                await ChatModel.findOneAndUpdate({ userId }, { $push: { messageList: newMessage } });
+                await ChatModel.findOneAndUpdate({ customerId }, { $push: { messageList: newMessage } });
 
                 if (role === 'client') {
-                    io.emit('admin message', { ...newMessage, userId });
+                    io.emit('admin message', { ...newMessage, customerId });
                 } else if (role === 'admin') {
-                    io.to(userId).emit('message', newMessage);
+                    io.to(customerId).emit('message', newMessage);
                 }
             } catch (error) {
                 emitErrorMsg(socket, '傳送訊息失敗');
@@ -127,8 +127,8 @@ export function connectSocketIO(server: HTTPServer) {
         //已讀
         socket.on('read', async data => {
             try {
-                const { userId, role } = data as SocketMsg;
-                const status = DataHandler(userId, role);
+                const { customerId, role } = data as SocketMsg;
+                const status = DataHandler(customerId, role);
                 if (!status.status) {
                     emitErrorMsg(socket, status.message);
                     return;
@@ -136,7 +136,7 @@ export function connectSocketIO(server: HTTPServer) {
 
                 //只更新該userId 並且把裡面的messageList根據role篩選後把read變成true
                 await ChatModel.updateMany(
-                    { userId },
+                    { customerId },
                     { $set: { 'messageList.$[elem].read': true } },
                     {
                         arrayFilters: [{ 'elem.role': role === 'client' ? 'admin' : 'client' }],
@@ -145,9 +145,9 @@ export function connectSocketIO(server: HTTPServer) {
                 );
 
                 if (role === 'client') {
-                    io.emit('admin read', { status: 'success', userId, message: '已成功標記為已讀' });
+                    io.emit('admin read', { status: 'success', customerId, message: '已成功標記為已讀' });
                 } else if (role === 'admin') {
-                    io.to(userId).emit('read', { status: 'success', message: '已成功標記為已讀' });
+                    io.to(customerId).emit('read', { status: 'success', message: '已成功標記為已讀' });
                 }
             } catch (error) {
                 emitErrorMsg(socket, '標記訊息為已讀失敗');

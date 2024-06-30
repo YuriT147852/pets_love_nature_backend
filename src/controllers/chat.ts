@@ -4,15 +4,15 @@ import ChatModel from '@/models/chat';
 import { successResponse } from '@/utils/successHandler';
 
 //抓取單一使用者聊天室
-export const getChatHistory: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getChatHistory: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await ChatModel.find({
-        userId: req.params.customerId
+        customerId: req.params.customerId
     });
 
-    if (result.length === 0) {
-        next(errorResponse(404, '該使用者不存在'));
-        return;
-    }
+    // if (result.length === 0) {
+    //     next(errorResponse(404, '該使用者不存在'));
+    //     return;
+    // }
 
     res.status(200).json(
         successResponse({
