@@ -192,7 +192,7 @@ export const addCart: RequestHandler = handleErrorAsync(async (req, res, _next) 
             for (let j = 0; j < checkInStock.length; j++) {
                 // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 if (checkedInStock[j].productSpec === customerData.shoppingCart[i].productSpec.toString())
-                    customerData.shoppingCart[i].quantity = checkedInStock[i].quantity;
+                    customerData.shoppingCart[i].quantity = checkedInStock[j].quantity;
             }
         }
 
