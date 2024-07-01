@@ -7,18 +7,19 @@ import * as payment from '@/utils/payment';
 import { PaymentItem, ResPaymentItem } from '@/types/order';
 import { PaymentResponse } from '@/types/payment';
 import OpenAI from 'openai';
+import shoppingCartModel from '@/models/shoppingCart';
+import { Customer } from '@/models/customer';
+import mongoose from 'mongoose';
+import ProductModel from '@/models/product';
 
-export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await OrderModel.find(
         {
             userId: req.params.userId
         },
         { _id: true, orderDate: true, deliveryDate: true, orderAmount: true, orderStatus: true }
-    );
-    if (result.length === 0) {
-        next(errorResponse(404, '消費者訂單不存在'));
-        return;
-    }
+    ).sort({ orderDate: -1 });
+
     res.status(200).json(
         successResponse({
             message: '取得消費者訂單成功',
@@ -27,14 +28,11 @@ export const getOrdersList: RequestHandler = handleErrorAsync(async (req, res, n
     );
 });
 
-export const getOrders: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getOrders: RequestHandler = handleErrorAsync(async (req, res, _next) => {
     const result = await OrderModel.find({
         _id: req.params.orderId
     });
-    if (result.length === 0) {
-        next(errorResponse(404, '該訂單資訊不存在'));
-        return;
-    }
+
     res.status(200).json(
         successResponse({
             message: '取得訂單資訊成功',
@@ -44,7 +42,7 @@ export const getOrders: RequestHandler = handleErrorAsync(async (req, res, next)
 });
 
 export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { page, filterStatus, searchText, requestSame, searchType } = req.query;
+    const { page, filterStatus, searchText, requestSame, searchType, limit } = req.query;
 
     if (!page) {
         next(errorResponse(404, 'page 為必填'));
@@ -69,8 +67,8 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
         }
     }
 
-    //每頁5筆
-    const pageSize = 5;
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
     //大小排序
     const filter = filterStatus === '1' ? 1 : -1;
     const skip = (Number(page) - 1) * pageSize;
@@ -83,7 +81,7 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
     if (!searchText) {
         const result = await OrderModel.find({}, { _id: true, orderStatus: true })
             .sort({ orderStatus: filter })
-            .populate({ path: 'userId', select: 'email' })
+            .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
 
@@ -95,8 +93,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 orderStatus: item.orderStatus
             })),
             page: {
-                nowPage: page,
-                totalPages
+                nowPage: parseInt(page as string),
+                totalPages,
+                totalDocuments
             }
         };
 
@@ -128,8 +127,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             const resData = {
                 OrderData: [],
                 page: {
-                    nowPage: page,
-                    totalPages: 0
+                    nowPage: parseInt(page as string),
+                    totalPages: 0,
+                    totalDocuments: 0
                 }
             };
 
@@ -152,7 +152,7 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
 
         const OrderResult = await OrderModel.find({ $or: formatResult }, { _id: true, orderStatus: true })
             .sort({ orderStatus: filter })
-            .populate({ path: 'userId', select: 'email' })
+            .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
 
@@ -164,8 +164,9 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 orderStatus: item.orderStatus
             })),
             page: {
-                nowPage: page,
-                totalPages
+                nowPage: parseInt(page as string),
+                totalPages,
+                totalDocuments
             }
         };
 
@@ -183,7 +184,26 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             return;
         }
 
-        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate({
+        //先檢查有無id
+        if (!mongoose.Types.ObjectId.isValid(text)) {
+            res.status(200).json(
+                successResponse({
+                    message: '沒有該筆訂單',
+                    data: {
+                        OrderData: [],
+                        page: {
+                            nowPage: parseInt(page as string),
+                            totalPages: 0,
+                            totalDocuments: 0
+                        }
+                    }
+                })
+            );
+        }
+
+        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate<{
+            userId: Customer;
+        }>({
             path: 'userId',
             select: 'email'
         });
@@ -194,7 +214,12 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 userId: item['userId'].id,
                 email: item['userId'].email,
                 orderStatus: item.orderStatus
-            }))
+            })),
+            page: {
+                nowPage: parseInt(page as string),
+                totalPages: 1,
+                totalDocuments: 1
+            }
         };
 
         res.status(200).json(
@@ -211,9 +236,19 @@ const { MerchantID, Version, PayGateWay, NotifyUrl, ReturnUrl } = process.env;
 export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const item = req.body as PaymentItem;
 
-    const { Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName } = item;
+    const { Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName, deliveryPhone } = item;
 
-    if (!Email || !Amt || !ItemDesc || !userId || !orderProductList || !deliveryAddress || !deliveryUserName) {
+    if (
+        !Email ||
+        !Amt ||
+        !ItemDesc ||
+        !userId ||
+        !orderProductList ||
+        !deliveryAddress ||
+        !deliveryUserName ||
+        !deliveryPhone
+    ) {
+        console.log(Email, Amt, ItemDesc, userId, orderProductList, deliveryAddress, deliveryUserName, deliveryPhone);
         next(errorResponse(400, 'body參數錯誤'));
         return;
     } else if (orderProductList.length === 0) {
@@ -223,12 +258,23 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
 
     //新增一筆訂單
     const resultOrder = await OrderModel.create({
+        orderAmount: Amt,
         userId,
         orderProductList,
         deliveryAddress,
-        orderStatus: 1,
-        deliveryUserName
+        orderStatus: -3,
+        deliveryUserName,
+        deliveryEmail: Email,
+        deliveryPhone
     });
+
+    // 更新每個商品的銷售量
+    for (const item of resultOrder.orderProductList) {
+        const productId = item.productId;
+        await ProductModel.findByIdAndUpdate(productId, {
+            $inc: { salesVolume: item.quantity }
+        }).exec();
+    }
 
     //需要一個時間戳
     const TimeStamp = Math.round(new Date().getTime() / 1000);
@@ -268,14 +314,42 @@ export const usePayment: RequestHandler = handleErrorAsync(async (req, res, next
     );
 });
 
-export const PaymentNotify: RequestHandler = handleErrorAsync((req, res, _next) => {
-    console.log('req body notify data', req.body);
-
+export const PaymentNotify: RequestHandler = handleErrorAsync(async (req, res, next) => {
     const response = req.body as PaymentResponse;
 
     //解密交易內容
     const data = payment.createSesDecrypt(response.TradeInfo);
-    console.log('data', data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const orderId = data?.Result?.MerchantOrderNo;
+
+    //找是否有這個訂單
+    const result = await OrderModel.findOne({ _id: orderId });
+
+    if (!result) {
+        console.log('無訂單資料');
+        next(errorResponse(404, '無訂單資料'));
+        return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (data.Status !== 'SUCCESS') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        console.log('訂單失敗', data?.Result?.Status);
+        next(errorResponse(404, '訂單失敗'));
+        return;
+    }
+
+    //成功就更新狀態
+    await OrderModel.updateOne({ _id: orderId }, { orderStatus: 1 });
+
+    //先抓
+    const userId = result.userId;
+    // 确保 userId 是 ObjectId 类型
+    const objectId = typeof userId === 'string' ? new mongoose.Types.ObjectId(userId) : userId;
+
+    //把購物車裡shoppingCart是TRUE刪掉
+    await shoppingCartModel.updateMany({ customerId: objectId }, { $pull: { shoppingCart: { isChoosed: true } } });
 
     res.status(200).json(
         successResponse({
@@ -348,45 +422,28 @@ export const getAiText: RequestHandler = handleErrorAsync(async (req, res, next)
         model: 'gpt-3.5-turbo-16k',
         messages: [
             {
-                // 環境與規則
                 role: 'system',
                 content: '你是一個電商賣家,賣各種寵物食品,需要生成文案'
             },
             {
-                // 代表用戶輸入,問題
                 role: 'user',
                 content: text
-            },
-            {
-                // 預期的助手回答
-                role: 'assistant',
-                content: '好的，請稍等，我將生成一段關於這個產品的文案。'
-            },
-            {
-                // 代表用戶進一步輸入或確認
-                role: 'user',
-                content: '好的，麻煩你了。'
             }
         ],
-        // 限制最大長度
-        // max_tokens: 150,
-        // 0~1 越大隨機性越大
+        max_tokens: 300,
         temperature: 0.7,
-        // 生成概率質量
         top_p: 0.9,
-        // 重複度
         frequency_penalty: 0,
-        // 新穎度
         presence_penalty: 0.6
     });
 
-    const ResText = chatCompletion.choices[0].message.content;
-    const AiText = ResText ? ResText.trim() : '';
+    let responseText = chatCompletion.choices[0].message.content;
+    responseText = responseText.replace(/\n/g, ' ');
 
     res.status(200).json(
         successResponse({
             message: '文案取得成功',
-            data: AiText
+            data: responseText
         })
     );
 });

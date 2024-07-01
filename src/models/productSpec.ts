@@ -1,13 +1,15 @@
 import { Schema, model, type Document } from 'mongoose';
+import { IProduct } from './product';
 
 export interface IProductSpec extends Document {
-  productId: Schema.Types.ObjectId;
+  productId: Schema.Types.ObjectId | IProduct;
   productNumber: string;
   weight: number;
   price: number;
   inStock: number;
   onlineStatus: boolean;
   onlineDate: Date;
+  isValid: boolean; // 若刪除商品規格則顯示false
 }
 
 const productSpecSchema = new Schema<IProductSpec>(
@@ -38,6 +40,10 @@ const productSpecSchema = new Schema<IProductSpec>(
     },
     onlineDate: {
       type: Date,
+    },
+    isValid: {
+      type: Boolean,
+      default: true
     },
   },
   {

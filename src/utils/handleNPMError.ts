@@ -8,6 +8,7 @@ export const handleNPMError: ErrorRequestHandler = (err, _req, res, next): void 
             message: 'code 參數錯誤',
             status: 'false'
         });
+        return;
     } else if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).json({
             status: 'false',

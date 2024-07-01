@@ -13,25 +13,25 @@ router.get(
                 "status": "success",
                 "data": [
                     {
-                    "_id": "666d55e6c28192e47c6c27d5",
-                    "userId": "663f12237a6dabc6203875f4",
+                    "_id": "667fbef84b42bfa8fc1a1709",
                     "messageList": [
                         {
-                           "role": "client",
-                            "read": true,
-                            "message": "安安你好",
-                            "chatId": "661a9a9fa892ea2a833a1009",
-                            "createdAt": "2024-06-15T08:50:50.723Z"
+                            "role": "client",
+                            "read": false,
+                            "message": "這是訊息888",
+                            "chatId": "667fbf154b42bfa8fc1a170e",
+                            "createdAt": "2024-06-29T08:00:21.851Z"
                         },
                     ],
-                    "createdAt": "2024-06-15T08:50:46.093Z"
+                    "createdAt": "2024-06-29T07:59:52.835Z",
+                    "customerId": "663f12237a6dabc6203875f4"
                     }
                 ],
                 "message": "抓取使用者歷史資訊成功"
-                }
+            }
         }
      */
-    '/getChatHistory/:userId',
+    '/getChatHistory/:customerId',
     ChatController.getChatHistory
 );
 

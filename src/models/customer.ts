@@ -7,7 +7,7 @@ interface DeliveryAddress {
     address: string | null;
 }
 
-interface Customer extends Document {
+export interface Customer extends Document {
     // 收件人姓名
     recipientName: string;
     recipientAddress: DeliveryAddress;
@@ -78,6 +78,7 @@ const customerSchema = new Schema<Customer>(
         },
         accountStatus: {
             type: Number,
+            enum: [0, 1],
             default: 1
         }
     },

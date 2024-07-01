@@ -38,34 +38,39 @@ router.get(
  * #swagger.responses[200] = {
         description: "取得成功",
         schema: {
-            "message": "成功",
+            "status": "success",
             "data": [
                 {
-                    "_id": "663f2c28c52d18d64cdb4570",
-                    "userId": "663f12237a6dabc6203875f4",
-                    "orderProductList": [
-                        {
-                            "productId": "663f18d3fc11d10c288dc062",
-                            "price": 300,
-                            "amount": 5
-                        }
-                    ],
-                    "orderDate": "2024-04-15T12:30:00.000Z",
-                    "deliveryDate": "2024-04-15T12:30:00.000Z",
-                    "orderAmount": 2000,
-                    "orderStatus": 1,
-                    "paymentMethod": 1,
-                    "shippingUserName": "2024-04-15T12:30:00.000Z",
-                    "deliveryAddress": {
-                        "country": "台灣",
-                        "county": "台北市",
-                        "district": "信義區",
-                        "address": "快樂鎮1234號5樓"
-                    },
-                    "note": "快點送",
-                    "doneDate": "2024-04-15T12:30:00.000Z"
+                "_id": "6672df9274d4bcc0f6154590",
+                "userId": "66436361c2ae643fc43bf18a",
+                "orderProductList": [
+                    {
+                    "productId": "661a9a9fa892ea2a833a1009",
+                    "price": 500,
+                    "quantity": 123,
+                    "productTitle": "這是名稱",
+                    "coverImg": "https://imageUrl.com",
+                    "weight": 76
+                    }
+                ],
+                "orderStatus": -3,
+                "deliveryUserName": "王小名",
+                "deliveryAddress": {
+                    "country": "台灣",
+                    "county": "台北市",
+                    "district": "信義區",
+                    "address": "快樂鎮12345號"
+                },
+                "note": "",
+                "deliveryEmail": "test@google.com",
+                "deliveryPhone": "0978071727",
+                "orderDate": "2024-06-19T13:39:30.850Z",
+                "createdAt": "2024-06-19T13:39:30.852Z",
+                "updatedAt": "2024-06-19T13:39:30.852Z"
                 }
-            ]
+            ],
+            "message": "取得訂單資訊成功"
+            }
         }
     }
  */
@@ -86,21 +91,24 @@ router.post(
             "Email": "test@google.com",
             "Amt": 3000,
             "ItemDesc": "商品描述7777",
-            "deliveryUserName":"王小名",
-            "userId":"66436361c2ae643fc43bf18a",
-                "orderProductList": [
-                        {
-                            "productId":"661a9a9fa892ea2a833a1009",
-                            "price": 500,
-                            "amount": 6
-                        }
-                ],
-            "deliveryAddress": {
-                    "country":"台灣",
-                    "county":"台北市",
-                    "district":"信義區",
-                    "address":"快樂鎮12345號"
+            "deliveryUserName": "王小名",
+            "userId": "66436361c2ae643fc43bf18a",
+            "deliveryPhone":"0978071727",
+            "orderProductList": [
+                {
+                "productId": "661a9a9fa892ea2a833a1009",
+                "price": 500,
+                "amount": 6,
+                "coverImg":"aaa",
+                "productTitle":"111",
+                "quantity":123
                 }
+            ],
+            "deliveryAddress": {
+                "country": "台灣",
+                "county": "台北市",
+                "district": "信義區",
+                "address": "快樂鎮12345號"
             }
         }
     };
@@ -117,11 +125,15 @@ router.post(
                     "ItemDesc": "商品描述7777",
                     "deliveryUserName": "王小名",
                     "userId": "66436361c2ae643fc43bf18a",
+                    "deliveryPhone": "0978071727",
                     "orderProductList": [
                         {
                             "productId": "661a9a9fa892ea2a833a1009",
                             "price": 500,
-                            "amount": 6
+                            "amount": 6,
+                            "coverImg": "aaa",
+                            "productTitle": "111",
+                            "quantity": 123
                         }
                     ],
                     "deliveryAddress": {
@@ -130,14 +142,14 @@ router.post(
                         "district": "信義區",
                         "address": "快樂鎮12345號"
                     },
-                    "TimeStamp": 1717912952,
-                    "MerchantOrderNo": "6665457745933f177541666d",
-                    "aesEncrypt": "6b8068a80867a3ff7ef669cd840286db7f7d33f8703a4e68245869cc718549e1e52023a3fc61938f654dd96eea24027119bf2431ed7fc3ff25246e28653a10b3f2857d6c5457e55951c564c72bb6bb0e6f257317ade39a2d916c6832266f00d4e1df2435282b4cb7a1d4ebe68c04f9975d7f06856486fee7bf25e02d0aacd0292df3372df3dc8af1112dd2fad1df4389f297d0a2b15632f7ff242a13963670d9042e748586380272365187bb405b011989951c9f9afa4d5bd55b86be8dadbac5ca20057a14c2bf4190b9df45b49cb2b61bb6e57d7c77665614a7e63df75d61bb",
-                    "shaEncrypt": "67A5B3D93A1F24822528F9A0163A64BBBE1A592AEBA58A9089F2653D2C61D63A"
+                    "TimeStamp": 1718804371,
+                    "MerchantOrderNo": "6672df9274d4bcc0f6154590",
+                    "aesEncrypt": "6b8068a80867a3ff7ef669cd840286db7f7d33f8703a4e68245869cc718549e14ca5561a8de23a6dfb6ff3eb054e1a085a4d04a2b11b0d872c5e03d5c1d3f3042950d47c3b0854dccedf2ae3a833672dc5e7dcd4a03459e18a1149c555f896035316def8572f19052fffe8e72a8a03a0a40ee12929bda59a630573b801916afac67ac7527fb6f69303c4ee5514195dae3258f1d9399e535edb123a7681a41d1d7750eace50f40fe16ea3bb5c6ec94d4c651becced64814bef287a9678be8472b5c1de534f2d1f70559f4bbb4176e36f8c359d8fda6775ad01ef12490e4e1230b6baad61e82982f0403b9ff388e0605e945ac56a2970fea6cb19f7e549aec9814b9d990c3a29a4fb2fb169cf941ae6945609fbed31cfbf799069ec67a3960d4968f8f0cce8fa2dc67323a149850b11125cdbfa04f30579271d7c431a4c6c6ec7f5554bfac55a83d83b1d80864d2c28d90d9e250ad9cbca82dec0964f565a7e8c306b5b551418f17c014c9fa7a0ee15adf55203e75c4cb66d6e1ca6460acbb5c64",
+                    "shaEncrypt": "230D3C0F6D18D8C0D5837174CDD09F66B0096B4796AD8CD91C2389AFB1F17CF5"
                 },
                 "MerchantID": "MS152505100",
-                "NotifyUrl": "",
-                "ReturnUrl": ""
+                "NotifyUrl": "https://pets-love-nature-backend-n.onrender.com/api/v1/payment_notify",
+                "ReturnUrl": "https://petslovenature-frontstage.onrender.com/checkout/step3"
             },
             "message": "成功抓取金流資訊"
         }
@@ -150,4 +162,27 @@ router.post(
 
 router.post('/payment_notify', OrderController.PaymentNotify);
 
+router.patch(
+    /**
+    * #swagger.description  = "修改某一筆訂單"
+    * #swagger.security=[{"Bearer": []}]
+    * #swagger.parameters['body'] = {
+        in: "body",
+        required: true,
+        schema:{
+            "orderId": "663f2c28c52d18d64cdb4570",
+            "orderStatus": 1
+        }
+    };
+    * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "message" : "更新成功",
+            }
+        }
+     */
+    '/orderStatus',
+    isAuth,
+    OrderController.editOrderStatus
+);
 export default router;

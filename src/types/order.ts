@@ -1,4 +1,4 @@
-import { DeliveryAddress, OrderProduct } from '@/models/orders';
+import { DeliveryAddress, OrderProduct, Order } from '@/models/orders';
 
 export interface PaymentItem {
     Email: string;
@@ -8,6 +8,7 @@ export interface PaymentItem {
     deliveryUserName: string;
     orderProductList: OrderProduct[];
     deliveryAddress: DeliveryAddress;
+    deliveryPhone: string;
 }
 
 export interface ResPaymentItem {
@@ -28,4 +29,8 @@ export interface ResPaymentItem {
     MerchantID: string;
     NotifyUrl: string;
     ReturnUrl: string;
+}
+
+export interface IShowOrder extends Order {
+    id: string;
 }
