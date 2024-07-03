@@ -112,7 +112,17 @@ export function connectSocketIO(server: HTTPServer) {
                     chatId: new mongoose.Types.ObjectId()
                 };
 
-                await ChatModel.findOneAndUpdate({ customerId }, { $push: { messageList: newMessage } });
+                // await ChatModel.findOneAndUpdate({ customerId }, { $push: { messageList: newMessage } });
+                await ChatModel.findOneAndUpdate(
+                    { customerId },
+                    {
+                        $push: { messageList: newMessage },
+                        $setOnInsert: {
+                            customerId: customerId
+                        }
+                    },
+                    { upsert: true }
+                );
 
                 if (role === 'client') {
                     io.emit('admin message', { ...newMessage, customerId });
@@ -156,16 +166,16 @@ export function connectSocketIO(server: HTTPServer) {
     });
 }
 
-function DataHandler(userId: string, role: string) {
-    if (!userId) {
+function DataHandler(customerId: string, role: string) {
+    if (!customerId) {
         return {
             status: false,
-            message: 'userId不存在'
+            message: 'customerId不存在'
         };
     } else if (!role) {
         return {
             status: false,
-            message: 'userId不存在'
+            message: 'customerId不存在'
         };
     } else {
         return {

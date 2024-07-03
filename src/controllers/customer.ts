@@ -115,7 +115,7 @@ export const passportGoogleCallback: RequestHandler = handleErrorAsync(async (re
         const token = generateToken({ userId: resCustomer._id });
 
         //增加聊天室
-        await ChatModel.create({ userId: resCustomer._id, messageList: [] });
+        await ChatModel.create({ customerId: resCustomer._id, messageList: [] });
 
         res.status(200).json(
             successResponse({
