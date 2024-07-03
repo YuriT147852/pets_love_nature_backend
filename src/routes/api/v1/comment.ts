@@ -84,8 +84,14 @@ router.get(
             schema: {
                 "status": "true",
                 "result": [
-                    { $ref: '#/definitions/CommentResponses' }
+                    { $ref: '#/definitions/UnCommentOrderIdResponses' }
                 ]
+            }
+        }
+     * #swagger.responses[404] = {
+            schema:             {
+                "status": "false",
+                "message": "無訂單資料",
             }
         }
      */
@@ -105,14 +111,46 @@ router.get(
             schema: {
                 "status": "true",
                 "result": [
-                    { $ref: '#/definitions/CommentResponses' }
+                    { $ref: '#/definitions/UnCommentResponses' }
                 ]
+            }
+        }
+     * #swagger.responses[404] = {
+            schema:             {
+                "status": "false",
+                "message": "無訂單資料",
             }
         }
      */
     '/getNoComment/:customerId/:orderId',
     isAuth,
-    CommentController.getComment
+    CommentController.getNoComment
+);
+
+// 取得消費者的歷史商品評價
+router.get(
+    /**
+     * #swagger.description  = "取得消費者的歷史商品評價"
+     * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['customerId'] = { description: '消費者ID' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "result": [
+                    { $ref: '#/definitions/CustomerCommentResponses' }
+                ]
+            }
+        }
+     * #swagger.responses[404] = {
+            schema:             {
+                "status": "false",
+                "message": "無評價資料",
+            }
+        }
+     */
+    '/getCommentByCustomerId/:customerId',
+    isAuth,
+    CommentController.getCommentByCustomerId
 );
 
 export default router;

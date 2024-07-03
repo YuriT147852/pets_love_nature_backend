@@ -133,6 +133,92 @@ const doc = {
             },
             message: '取得評論成功'
         },
+        UnCommentOrderIdResponses: {
+            status: 'success',
+            data: ['668176a23c47cbc8a1898562', '6683ef96086208014e849b69', '66840468086208014e849efd'],
+            message: '取得待評價的訂單列表'
+        },
+        UnCommentResponses: {
+            status: 'success',
+            data: [
+                {
+                    _id: '66840468086208014e849efd',
+                    userId: '6649fb0de0b4e28164a7f81c',
+                    orderProductList: [
+                        {
+                            productId: '6683fd4d086208014e849e05',
+                            price: 450,
+                            quantity: 1,
+                            productTitle: '魚油鮭魚肉凍乾',
+                            coverImg:
+                                'https://storage.googleapis.com/petstore-3a2e1.appspot.com/images/8644a486-8bc1-4336-9f26-035addd44742.jpeg?GoogleAccessId=firebase-adminsdk-p5zjq%40petstore-3a2e1.iam.gserviceaccount.com&Expires=16756675200&Signature=G1cifxtelACf1A5kBPqaLfqViyD19FWTo2q3yVj7aca3pC85eGPESQgn99ObSZoK4WJ8WHDKhlkIYcQkN2jd4aXiLiVWjvJCogmAa5IIKfsUQzP%2FkOZI21QdGB1mW0Gg4ebPP%2B%2BlYNjNa9qjYoz3GFFTfTB88Xdp9Imi5ZwHPsXwES9m%2FPniwTWUdSjG37c9bU6CVFHIUMD95Dx5d6vGoQOAYYs%2BSBibbJzqzLjw09aQVouxjdDadLWgNk1PC1kXRI%2FOkn2PYCdSpqBIe2c71N0RmXpbpVlai%2BUipNoEMXVuFq8nBb0WjoW15kYfJrdwyYHd2Jim4al6mJGJzw2i%2Fw%3D%3D',
+                            weight: 100
+                        }
+                    ],
+                    orderStatus: 4,
+                    orderAmount: 450,
+                    deliveryUserName: 'KKK',
+                    deliveryAddress: {
+                        country: 'Taiwan',
+                        county: '新北市',
+                        district: '中和區',
+                        address: '中山路一段'
+                    },
+                    note: '',
+                    deliveryEmail: 's9654003@gmail.com',
+                    deliveryPhone: '0987654321',
+                    orderDate: '2024-07-02T13:45:12.333Z',
+                    createdAt: '2024-07-02T13:45:12.334Z',
+                    updatedAt: '2024-07-02T13:49:28.267Z'
+                }
+            ],
+            message: '成功取得評價'
+        },
+        CustomerCommentResponses: {
+            status: 'success',
+            data: [
+                {
+                    _id: '666ea32b2949401b22e54e4e',
+                    customerId: {
+                        _id: '663f12237a6dabc6203875f4',
+                        email: 'd22495521@gmail.com',
+                        customerName: '王大頭3',
+                        image: ''
+                    },
+                    productId: {
+                        _id: '665a9f704a2dbe2bbf936563',
+                        title: '鮮嫩牛腿排凍乾',
+                        subtitle: '新鮮牛腿排，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素',
+                        star: 4.3,
+                        category: ['dry', 'fresh', 'cat', 'dog'],
+                        otherInfo: [
+                            {
+                                infoName: '產地',
+                                infoValue: '台灣'
+                            }
+                        ],
+                        imageGallery: [
+                            {
+                                _id: '668513875dbf70f6e9d02c36',
+                                imgUrl: 'https://images.unsplash.com/photo-1571873735645-1ae72b963024?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                                altText: '狗鮮食'
+                            },
+                            {
+                                _id: '668513875dbf70f6e9d02c37',
+                                imgUrl: 'https://images.unsplash.com/photo-1565826357292-caba11217a55?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                                altText: '狗鮮食'
+                            }
+                        ]
+                    },
+                    orderId: '666e983c8e72d5cb153de579',
+                    star: 4.2,
+                    comment: '貓吃的非常喜歡',
+                    createdAt: '2024-06-16T08:32:43.194Z',
+                    updatedAt: '2024-06-16T08:32:43.194Z'
+                }
+            ],
+            message: '成功取得該顧客的歷史商品評價，顧客ID: 663f12237a6dabc6203875f4'
+        },
         ProductListResponses: [
             {
                 _id: '66487aba27b3916f705679f0',

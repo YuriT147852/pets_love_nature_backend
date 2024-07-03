@@ -4,7 +4,9 @@ import { successResponse } from '@/utils/successHandler';
 import CommentModel from '@/models/comment';
 import CustomerModel from '@/models/customer';
 import OrderModel from '@/models/orders';
-import ProductModel from '@/models/product';
+import ProductModel, { IProduct } from '@/models/product';
+import ProductSpecModel from '@/models/productSpec';
+import { Schema } from 'mongoose';
 
 
 // 取得所有商品的評價
@@ -77,27 +79,36 @@ export const createComment: RequestHandler = handleErrorAsync(async (req, res, n
     return next(errorResponse(404, '無此消費者ID: ' + customerId));
   }
 
-  const resProduct = await ProductModel.findOne({ _id: productId });
-  if (!resProduct) {
-    return next(errorResponse(404, '無此商品ID: ' + productId));
-  }
-
   const resOrder = await OrderModel.findOne({ _id: orderId });
   if (!resOrder) {
     return next(errorResponse(404, '無此訂單ID: ' + orderId));
   }
 
+  let productInfoId: string | Schema.Types.ObjectId | IProduct;
+  const resProduct = await ProductModel.findOne({ _id: productId });
+  if (!resProduct) {
+    const resProductSpec = await ProductSpecModel.findOne({ _id: productId }).exec();
+    if (!resProduct) {
+      return next(errorResponse(404, '無此商品資訊及規格ID: ' + productId));
+    }
+    productInfoId = resProductSpec.productId;
+  }
+  productInfoId = resProduct._id;
+
   // All checks passed, create the comment
-  const result = await CommentModel.create({
+  const resCreateComment = await CommentModel.create({
     customerId,
-    productId,
+    productId: productInfoId,
     orderId,
     star,
     comment
   });
+  if (!resCreateComment) {
+    return next(errorResponse(404, '商品評論建立失敗，商品資訊ID: ' + productInfoId + " / 訂單ID" + orderId));
+  }
 
   // 統計評價的分數去更新商品的評分(star)欄位
-  const productInfo = await ProductModel.findById(productId).exec(); // 查找当前商品的评分和销售量
+  const productInfo = await ProductModel.findById(productInfoId).exec(); // 查找当前商品的评分和销售量
   const currentQuantity = quantity;
   const currentStar = star;
   const salesVolume = productInfo.salesVolume;
@@ -106,16 +117,13 @@ export const createComment: RequestHandler = handleErrorAsync(async (req, res, n
   // 计算新的评分
   const newStar = ((historyStar * salesVolume) + (currentStar * currentQuantity)) / (salesVolume + currentQuantity);
 
-  await ProductModel.findByIdAndUpdate(productId, {
+  await ProductModel.findByIdAndUpdate(productInfoId, {
     star: newStar,
   }).exec();
 
-  console.log("新增訂單 result: ", result);
-
-
   res.status(200).json(
     successResponse({
-      message: '建立評價成功, 商品資訊ID: ' + productId,
+      message: '建立評價成功, 商品資訊ID: ' + productInfoId,
     }),
   );
 });
@@ -161,7 +169,7 @@ export const getNoCommentOrderIdList: RequestHandler = handleErrorAsync(async (r
 });
 
 // 取得消費者未評價的該筆訂單及商品資訊
-export const getComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
+export const getNoComment: RequestHandler = handleErrorAsync(async (req, res, next) => {
   const { customerId, orderId } = req.params;
   const resOrder = await OrderModel.find({
     userId: customerId, _id: orderId
@@ -175,6 +183,30 @@ export const getComment: RequestHandler = handleErrorAsync(async (req, res, next
     successResponse({
       message: '成功取得評價',
       data: resOrder,
+    }),
+  );
+});
+
+export const getCommentByCustomerId: RequestHandler = handleErrorAsync(async (req, res, next) => {
+  const { customerId } = req.params;
+  const resComment = await CommentModel.find({
+    customerId
+  }).populate({
+    path: 'productId',
+    select: 'title subtitle star category otherInfo imageGallery'
+  }).populate({
+    path: 'customerId',
+    select: 'customerName image email'
+  });
+
+  if (resComment.length === 0) {
+    return next(errorResponse(404, '無評價資料'));
+  }
+
+  res.status(200).json(
+    successResponse({
+      message: '成功取得該顧客的歷史商品評價，顧客ID: ' + customerId,
+      data: resComment,
     }),
   );
 });
