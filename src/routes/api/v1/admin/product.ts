@@ -94,11 +94,13 @@ router.post(
                         "weight": 50,
                         "price": 60,
                         "inStock": 50,
+                        "onlineStatus": false
                     },
                     {
                         "weight": 200,
                         "price": 180,
                         "inStock": 50,
+                        "onlineStatus": false
                     }
                 ],
                 "imageGallery": 
@@ -136,11 +138,13 @@ router.post(
                         "weight": 50,
                         "price": 60,
                         "inStock": 50,
+                        "onlineStatus": false
                     },
                     {
                         "weight": 200,
                         "price": 180,
                         "inStock": 50,
+                        "onlineStatus": false
                     }
                 ]
             }           

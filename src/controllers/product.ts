@@ -105,6 +105,8 @@ export const createProduct: RequestHandler = handleErrorAsync(async (req, res, _
             const weight = productSpecList[i].weight;
             const price = productSpecList[i].price;
             const inStock = productSpecList[i].inStock;
+            const onlineStatus = productSpecList[i].onlineStatus;
+            const onlineDate = productSpecList[i].onlineStatus ? Date.now() : ''
 
             // 2.建立商品規格
             const resultProductSpec = await ProductSpecModel.create({
@@ -112,7 +114,9 @@ export const createProduct: RequestHandler = handleErrorAsync(async (req, res, _
                 productNumber,
                 weight,
                 price,
-                inStock
+                inStock,
+                onlineStatus,
+                onlineDate
             });
 
             await resultProductSpec.populate({
@@ -540,6 +544,8 @@ export const createProductSpec: RequestHandler = handleErrorAsync(async (req, re
         const weight = productSpecList[i].weight;
         const price = productSpecList[i].price;
         const inStock = productSpecList[i].inStock;
+        const onlineStatus = productSpecList[i].onlineStatus;
+        const onlineDate = productSpecList[i].onlineStatus ? Date.now() : ''
 
         // 2.建立商品規格
         const resultProductSpec = await ProductSpecModel.create({
@@ -547,7 +553,9 @@ export const createProductSpec: RequestHandler = handleErrorAsync(async (req, re
             productNumber,
             weight,
             price,
-            inStock
+            inStock,
+            onlineStatus,
+            onlineDate
         });
 
         await resultProductSpec.populate({
