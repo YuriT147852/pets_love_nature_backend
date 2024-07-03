@@ -86,14 +86,16 @@ export const createComment: RequestHandler = handleErrorAsync(async (req, res, n
 
   let productInfoId: string | Schema.Types.ObjectId | IProduct;
   const resProduct = await ProductModel.findOne({ _id: productId });
+
   if (!resProduct) {
     const resProductSpec = await ProductSpecModel.findOne({ _id: productId }).exec();
-    if (!resProduct) {
+    if (!resProductSpec) {
       return next(errorResponse(404, '無此商品資訊及規格ID: ' + productId));
     }
     productInfoId = resProductSpec.productId;
+  } else {
+    productInfoId = resProduct._id;
   }
-  productInfoId = resProduct._id;
 
   // All checks passed, create the comment
   const resCreateComment = await CommentModel.create({
