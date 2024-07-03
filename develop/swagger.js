@@ -219,6 +219,43 @@ const doc = {
             ],
             message: '成功取得該顧客的歷史商品評價，顧客ID: 663f12237a6dabc6203875f4'
         },
+        OrderCommentResponses: {
+            status: 'success',
+            data: [
+                {
+                    _id: '667fbc72c720331d70353553',
+                    customerId: {
+                        _id: '667d8798c3874ad847ad6e76',
+                        email: 'yurit630@gmail.com',
+                        customerName: 'Wenfish Tseng',
+                        image: 'https://lh3.googleusercontent.com/a/ACg8ocILpy2TrC3KJFAaRe9bN2p0zbfXcJxuv4BmFZQaeink3HDofTNJ=s96-c'
+                    },
+                    productId: {
+                        _id: '664c90d099eb1ab9b3c4f643',
+                        title: '鮮嫩雞胸肉凍乾',
+                        subtitle: '新鮮雞胸肉，符合人食等級，富含高品質蛋白質，提供毛孩維持健康體愛所需的重要營養素',
+                        imageGallery: [
+                            {
+                                imgUrl: 'https://images.unsplash.com/photo-1565826357186-e0f4f2b26232?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                                altText: '狗鮮食',
+                                _id: '66802a98cdbe545bcbbb4b2b'
+                            },
+                            {
+                                imgUrl: 'https://storage.googleapis.com/petstore-3a2e1.appspot.com/images/b4ef6503-8ea3-455f-b0bb-e3431dc9d31c.jpg?GoogleAccessId=firebase-adminsdk-p5zjq%40petstore-3a2e1.iam.gserviceaccount.com&Expires=16756675200&Signature=GOPtHn8x7Cmof4Lc0DxN2fgofe2oQr3JcJSWHOMZqsjfehIHFhHBQSuKv8lATbOn0Nc4o8O43wHUeqoOMnoZ7CA2zx1cCpiwZA2C0EOFdFjRC8UmRhbKd65hxQLDAf8K8ApdUi9HwSm4KcMRfRsUhKhL4%2BkhzavWufvK%2F0a2Ew9RW69fZGq0ri53M0OLZLFC1TE7IPQUsEULe%2B5fHVAkezZwpPNsKxCoLj3f6Rvlzkov7ZU98usfiPh3IftBzuzWKGFzY3OpW23Q5JEoeT2dtc2esiIHnhXJHT4cLU7yCU3iVA%2FsckIpIJu6M6aRCuDZz7xgwE1mqFI8j5PM38prWA%3D%3D',
+                                altText: 'abc',
+                                _id: '66802a98cdbe545bcbbb4b2c'
+                            }
+                        ]
+                    },
+                    orderId: '667d87cec3874ad847ad6e96',
+                    star: 4.8,
+                    comment: '貓吃的非常非常喜歡,絕對會回購!!!',
+                    createdAt: '2024-06-29T07:49:06.422Z',
+                    updatedAt: '2024-06-29T07:49:06.422Z'
+                }
+            ],
+            message: '成功取得該顧客的歷史商品評價，訂單ID: 667d87cec3874ad847ad6e96'
+        },
         ProductListResponses: [
             {
                 _id: '66487aba27b3916f705679f0',

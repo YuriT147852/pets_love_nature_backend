@@ -212,3 +212,27 @@ export const getCommentByCustomerId: RequestHandler = handleErrorAsync(async (re
     }),
   );
 });
+
+export const getCommentByOrderId: RequestHandler = handleErrorAsync(async (req, res, next) => {
+  const { orderId } = req.params;
+  const resComment = await CommentModel.find({
+    orderId
+  }).populate({
+    path: 'productId',
+    select: 'title subtitle imageGallery'
+  }).populate({
+    path: 'customerId',
+    select: 'customerName image email'
+  });
+
+  if (resComment.length === 0) {
+    return next(errorResponse(404, '無評價資料'));
+  }
+
+  res.status(200).json(
+    successResponse({
+      message: '成功取得該顧客的歷史商品評價，訂單ID: ' + orderId,
+      data: resComment,
+    }),
+  );
+});

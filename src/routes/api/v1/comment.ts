@@ -153,4 +153,30 @@ router.get(
     CommentController.getCommentByCustomerId
 );
 
+// 取得消費者的對於某筆訂單的評價
+router.get(
+    /**
+     * #swagger.description  = "取得消費者的對於某筆訂單的評價"
+     * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['orderId'] = { description: '訂單ID' }
+     * #swagger.responses[200] = {
+            schema: {
+                "status": "true",
+                "result": [
+                    { $ref: '#/definitions/OrderCommentResponses' }
+                ]
+            }
+        }
+     * #swagger.responses[404] = {
+            schema:             {
+                "status": "false",
+                "message": "無評價資料",
+            }
+        }
+     */
+    '/getCommentByOrderId/:orderId',
+    isAuth,
+    CommentController.getCommentByOrderId
+);
+
 export default router;
