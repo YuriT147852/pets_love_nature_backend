@@ -7,7 +7,6 @@ import OrderModel from '@/models/orders';
 import ProductModel, { IProduct } from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
 import { Schema } from 'mongoose';
-import { INoCommentOrder, MyOrderProduct } from '@/types/order';
 
 
 // 取得所有商品的評價
