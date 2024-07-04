@@ -152,7 +152,8 @@ const doc = {
                             productTitle: '魚油鮭魚肉凍乾',
                             coverImg:
                                 'https://storage.googleapis.com/petstore-3a2e1.appspot.com/images/8644a486-8bc1-4336-9f26-035addd44742.jpeg?GoogleAccessId=firebase-adminsdk-p5zjq%40petstore-3a2e1.iam.gserviceaccount.com&Expires=16756675200&Signature=G1cifxtelACf1A5kBPqaLfqViyD19FWTo2q3yVj7aca3pC85eGPESQgn99ObSZoK4WJ8WHDKhlkIYcQkN2jd4aXiLiVWjvJCogmAa5IIKfsUQzP%2FkOZI21QdGB1mW0Gg4ebPP%2B%2BlYNjNa9qjYoz3GFFTfTB88Xdp9Imi5ZwHPsXwES9m%2FPniwTWUdSjG37c9bU6CVFHIUMD95Dx5d6vGoQOAYYs%2BSBibbJzqzLjw09aQVouxjdDadLWgNk1PC1kXRI%2FOkn2PYCdSpqBIe2c71N0RmXpbpVlai%2BUipNoEMXVuFq8nBb0WjoW15kYfJrdwyYHd2Jim4al6mJGJzw2i%2Fw%3D%3D',
-                            weight: 100
+                            weight: 100,
+                            productInfoId: '665deb4b904012a106605d5e'
                         }
                     ],
                     orderStatus: 4,

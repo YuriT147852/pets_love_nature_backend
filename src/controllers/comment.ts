@@ -7,6 +7,7 @@ import OrderModel from '@/models/orders';
 import ProductModel, { IProduct } from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
 import { Schema } from 'mongoose';
+import { INoCommentOrder, MyOrderProduct } from '@/types/order';
 
 
 // 取得所有商品的評價
@@ -181,9 +182,24 @@ export const getNoComment: RequestHandler = handleErrorAsync(async (req, res, ne
     return next(errorResponse(404, '無訂單資料'));
   }
 
+  // 取得商品資訊ID
+  for (let i = 0; i < resOrder.length; i++) {
+    const tempOrderProductList = resOrder[i].orderProductList
+    for (let j = 0; j < tempOrderProductList.length; j++) {
+      const tempOrderProduct = tempOrderProductList[j]
+      const productId = tempOrderProduct.productId;
+      const tempProductInfo = await ProductModel.findById({ _id: productId }).exec();
+      tempOrderProduct["productInfoId"] = tempProductInfo?._id;
+      if (!tempProductInfo) {
+        const tempProductSpec = await ProductSpecModel.findById({ _id: productId }).exec();
+        tempOrderProduct["productInfoId"] = tempProductSpec.productId as Schema.Types.ObjectId;
+      }
+    }
+  }
+
   res.status(200).json(
     successResponse({
-      message: '成功取得評價',
+      message: '成功取得消費者未評價的訂單及商品資訊，訂單ID: ' + orderId,
       data: resOrder,
     }),
   );
