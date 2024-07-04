@@ -33,6 +33,7 @@ export interface Order extends Document {
     doneDate?: Date;
     deliveryEmail: string;
     deliveryPhone: string;
+    createdAt?: Date;
 }
 
 const deliveryaddressSchema = new Schema<DeliveryAddress>(

@@ -42,7 +42,7 @@ export const getOrders: RequestHandler = handleErrorAsync(async (req, res, _next
 });
 
 export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res, next) => {
-    const { page, filterStatus, searchText, requestSame, searchType, limit } = req.query;
+    const { page, filterStatus = 1, searchText, requestSame, searchType, limit, sortOrder } = req.query;
 
     if (!page) {
         next(errorResponse(404, 'page 為必填'));
@@ -70,27 +70,42 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
     // 默認 1 頁顯示 10 筆
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
     //大小排序
-    const filter = filterStatus === '1' ? 1 : -1;
+    const filter = filterStatus == '1' ? 1 : -1;
     const skip = (Number(page) - 1) * pageSize;
 
     // 獲取總頁數
     const totalDocuments = await OrderModel.countDocuments();
     const totalPages = Math.ceil(totalDocuments / pageSize);
 
+    const sortOptions: Record<string, 1 | -1> = {};
+
+    if (sortOrder === 'orderStatus') {
+        sortOptions['orderStatus'] = filter;
+        sortOptions['createdAt'] = 1;
+    } else if (sortOrder === 'createdAt') {
+        sortOptions['createdAt'] = filter;
+        sortOptions['orderStatus'] = 1;
+    } else {
+        sortOptions['createdAt'] = 1;
+        sortOptions['orderStatus'] = 1;
+    }
+
+    console.log(sortOptions);
     //不需要文字搜
     if (!searchText) {
-        const result = await OrderModel.find({}, { _id: true, orderStatus: true })
-            .sort({ orderStatus: filter })
+        const result = await OrderModel.find({}, { _id: true, orderStatus: true, createdAt: true })
+            .sort(sortOptions)
             .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
-
+        // console.log(result);
         const resData = {
             OrderData: result.map(item => ({
                 _id: item['_id'],
                 userId: item['userId'].id,
                 email: item['userId'].email,
-                orderStatus: item.orderStatus
+                orderStatus: item.orderStatus,
+                createdAt: item.createdAt
             })),
             page: {
                 nowPage: parseInt(page as string),
@@ -150,8 +165,11 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
 
         const totalPages = Math.ceil(totalDocuments / pageSize);
 
-        const OrderResult = await OrderModel.find({ $or: formatResult }, { _id: true, orderStatus: true })
-            .sort({ orderStatus: filter })
+        const OrderResult = await OrderModel.find(
+            { $or: formatResult },
+            { _id: true, orderStatus: true, createdAt: true }
+        )
+            .sort(sortOptions)
             .populate<{ userId: Customer }>({ path: 'userId', select: 'email' })
             .skip(skip)
             .limit(pageSize);
@@ -161,7 +179,8 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
                 _id: item['_id'],
                 userId: item['userId'].id,
                 email: item['userId'].email,
-                orderStatus: item.orderStatus
+                orderStatus: item.orderStatus,
+                createdAt: item.createdAt
             })),
             page: {
                 nowPage: parseInt(page as string),
@@ -201,12 +220,14 @@ export const getOrdersByAdmin: RequestHandler = handleErrorAsync(async (req, res
             );
         }
 
-        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true }).populate<{
-            userId: Customer;
-        }>({
-            path: 'userId',
-            select: 'email'
-        });
+        const OrderResult = await OrderModel.find({ _id: filterHandler }, { _id: true, orderStatus: true })
+            .sort(sortOptions)
+            .populate<{
+                userId: Customer;
+            }>({
+                path: 'userId',
+                select: 'email'
+            });
 
         const resData = {
             OrderData: OrderResult.map(item => ({
