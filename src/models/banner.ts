@@ -14,8 +14,7 @@ const bannerSchema = new Schema<IBanner>({
         require: [true, "圖片網址未填寫"]
     },
     hyperlink: {
-        type: String,
-        require: [true, "超連結網址未填寫"]
+        type: String
     },
     title: {
         type: String,
