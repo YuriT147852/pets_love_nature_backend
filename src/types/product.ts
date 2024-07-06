@@ -30,3 +30,8 @@ export interface IShowProduct {
   imageGallery: IImageGallery[];
   productSpecList: IShowProductSpec[];
 }
+
+export interface IProductList extends IProductSpec {
+  productInfoId: string;
+  productSpecId: string;
+}

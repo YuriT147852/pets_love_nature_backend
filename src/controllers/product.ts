@@ -3,7 +3,7 @@ import { errorResponse, handleErrorAsync } from '@/utils/errorHandler';
 import { successResponse } from '@/utils/successHandler';
 import ProductModel, { IProduct } from '@/models/product';
 import ProductSpecModel from '@/models/productSpec';
-import { ICreateProduct, IShowProduct, IShowProductSpec } from '@/types/product';
+import { ICreateProduct, IProductList, IShowProduct, IShowProductSpec } from '@/types/product';
 import { PipelineStage } from 'mongoose'
 
 interface MatchStage {
@@ -18,18 +18,29 @@ type SortOrder = 1 | -1;
 
 // 不加篩選
 export const getProductList: RequestHandler = handleErrorAsync(async (_req, res, next) => {
-    const result = await ProductSpecModel.find({}).populate({
-        path: 'productId'
-    });
+    const result = await ProductSpecModel.find({}).populate<{
+        productId: IProduct
+    }>("productId").exec();
 
     if (result.length === 0) {
         next(errorResponse(404, '無商品資料'));
         return;
     }
+
+    // 整理資料
+    const formattedResult: IProductList[] = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.productId._id; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
     res.status(200).json(
         successResponse({
             message: '取得商品資料成功',
-            data: result,
+            data: formattedResult,
         }),
     );
 });
@@ -94,6 +105,8 @@ export const createProduct: RequestHandler = handleErrorAsync(async (req, res, _
             const weight = productSpecList[i].weight;
             const price = productSpecList[i].price;
             const inStock = productSpecList[i].inStock;
+            const onlineStatus = productSpecList[i].onlineStatus;
+            const onlineDate = productSpecList[i].onlineStatus ? Date.now() : ''
 
             // 2.建立商品規格
             const resultProductSpec = await ProductSpecModel.create({
@@ -101,7 +114,9 @@ export const createProduct: RequestHandler = handleErrorAsync(async (req, res, _
                 productNumber,
                 weight,
                 price,
-                inStock
+                inStock,
+                onlineStatus,
+                onlineDate
             });
 
             await resultProductSpec.populate({
@@ -126,10 +141,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
     // 跳頁
     const skip = (Number(page) - 1) * pageSize;
-    // 獲取總筆數
-    const totalDocuments = await ProductSpecModel.countDocuments();
-    // 獲取總頁數
-    const totalPages = Math.ceil(totalDocuments / pageSize);
 
     // 排序
     const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
@@ -145,13 +156,14 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         case 'updatedAt':
             sortField = { 'product.updatedAt': sortOrderNumber };
             break;
-        case 'productSalesQuantity':
-            // todo: 計算訂單內的商品銷售數量
-            // sortField = { 'updatedAt': sortOrderNumber };
+        case 'salesVolume':
+            sortField = { 'product.salesVolume': sortOrderNumber };
             break;
-        default:
+        case 'inStock':
             sortField = { 'inStock': sortOrderNumber };
+            break;
     }
+    sortField = Object.assign({}, sortField, { 'productId': -1 });
 
     const aggregationPipeline: PipelineStage[] = [
         // 組裝商品資訊
@@ -173,11 +185,11 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         {
             $unwind: '$product'            // 展開成物件
         },
-        {
-            $project: {
-                productId: 0, // 排除 productId
-            }
-        }
+        // {
+        //     $project: {
+        //         productId: 0, // 排除 productId
+        //     }
+        // }
     ];
 
     // 創建一個空的 matchStage 物件
@@ -193,8 +205,154 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     }
     // 如果上限狀態有值
     if (onlineStatus !== undefined) {
-        matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
+        // console.log("0623 onlineStatus:   ", typeof onlineStatus, onlineStatus);
+        const isOnline = onlineStatus === 'true';
+        matchStage['onlineStatus'] = { $eq: isOnline };
+        // matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
     }
+
+    // 如果 matchStage 不是空對象，則添加 $match 階段
+    if (Object.keys(matchStage).length > 0) {
+        aggregationPipeline.push({ $match: matchStage });
+    }
+
+    // 不加入頁數先搜尋一次
+    const totalResult = await ProductSpecModel.aggregate(aggregationPipeline);
+
+    // 加入排序及分頁
+    aggregationPipeline.push(
+        { $sort: sortField },
+        { $skip: skip },                   // 跳過指定數量
+        { $limit: pageSize }               // 限制輸出數量
+    );
+    // console.log("aggregationPipeline: ", aggregationPipeline);
+
+    const result = await ProductSpecModel.aggregate(aggregationPipeline);
+    if (result.length === 0) {
+        res.status(200).json(
+            successResponse({
+                message: '無商品資料',
+                data: [],
+            }),
+        );
+    }
+
+    // 整理資料
+    const formattedResult = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.productId; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
+    // 獲取總筆數
+    const totalDocuments = totalResult.length;
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
+    const resData = {
+        content: formattedResult,
+        page: {
+            totalAmount: totalDocuments, // 此次搜尋全部數量
+            nowPage: Number(page),
+            totalPages,
+            pageSize: Number(pageSize) // 一頁顯示幾筆
+        }
+    }
+    res.status(200).json(
+        successResponse({
+            message: '取得商品資料成功',
+            data: resData,
+        }),
+    );
+
+});
+
+// 查詢後台篩選商品
+export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, res, _next) => {
+    const { page = 1, searchText = '', sortOrder = -1, sortBy, limit, filterCategory, onlineStatus } = req.query;
+
+    // 默認 1 頁顯示 10 筆
+    const pageSize = limit ? parseInt(limit as string, 10) : 10;
+    // 跳頁
+    const skip = (Number(page) - 1) * pageSize;
+
+    // 排序
+    const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
+    // 依照傳入的變數置換排序項目
+    let sortField: Record<string, SortOrder> = {};
+    switch (sortBy) {
+        case 'star':
+            sortField = { 'product.star': sortOrderNumber };
+            break;
+        case 'price':
+            sortField = { 'price': sortOrderNumber };
+            break;
+        case 'updatedAt':
+            sortField = { 'product.updatedAt': sortOrderNumber };
+            break;
+        case 'salesVolume':
+            sortField = { 'product.salesVolume': sortOrderNumber };
+            break;
+        case 'inStock':
+            sortField = { 'inStock': sortOrderNumber };
+            break;
+    }
+    sortField = Object.assign({}, sortField, { 'productId': -1 });
+
+    console.log("sortField: ", sortField);
+
+
+    const aggregationPipeline: PipelineStage[] = [
+        // 組裝商品資訊
+        {
+            $lookup: {
+                from: 'products',            // 目标集合名
+                localField: 'productId',     // 本集合中用于匹配的字段
+                foreignField: '_id',         // 目标集合中用于匹配的字段
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0, // 排除_id字段
+                        }
+                    }
+                ],
+                as: 'product'               // 輸出名稱
+            }
+        },
+        {
+            $unwind: '$product'            // 展開成物件
+        },
+        // {
+        //     $project: {
+        //         productId: 0, // 排除 productId
+        //     }
+        // }
+    ];
+
+    // 創建一個空的 matchStage 物件
+    const matchStage: MatchStage = {};
+    // 如果有關鍵字，則設置匹配條件
+    if (searchText) {
+        const regex = new RegExp(searchText as string, 'i'); // 不区分大小写
+        matchStage['product.title'] = { $regex: regex };
+    }
+    // 如果有分類，則也加入匹配條件
+    if (filterCategory) {
+        matchStage['product.category'] = { $in: [filterCategory] };
+    }
+    // 如果上限狀態有值
+    if (onlineStatus !== undefined) {
+        // console.log("0623 onlineStatus:   ", typeof onlineStatus, onlineStatus);
+        const isOnline = onlineStatus === 'true';
+        matchStage['onlineStatus'] = { $eq: isOnline };
+        // matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
+    }
+
+    // 不加入頁數先搜尋一次
+    const totalResult = await ProductSpecModel.aggregate(aggregationPipeline);
 
     // 如果 matchStage 不是空對象，則添加 $match 階段
     if (Object.keys(matchStage).length > 0) {
@@ -207,10 +365,9 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
-    console.log("aggregationPipeline: ", aggregationPipeline);
+    // console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
-    console.log("result: ", result);
     if (result.length === 0) {
         res.status(200).json(
             successResponse({
@@ -219,13 +376,29 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             }),
         );
     }
+    // console.log("res", result);
+    // 整理資料
+    const formattedResult = [];
+    for (let i = 0; i < result.length; i++) {
+        const productSpecRes = result[i];
+        const data = JSON.parse(JSON.stringify(productSpecRes))
+        data["productInfoId"] = productSpecRes.productId; // 商品資訊ID
+        data["productSpecId"] = productSpecRes._id; // 商品規格ID
+        formattedResult.push(data);
+    }
+
+    // 獲取總筆數
+    const totalDocuments = totalResult.length;
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
     const resData = {
-        content: result,
+        content: formattedResult,
         page: {
-            // todo: 一直顯示所有商品數量
-            // totalAmount: totalDocuments,
+            totalAmount: totalDocuments, // 此次搜尋全部數量
             nowPage: Number(page),
-            totalPages
+            totalPages,
+            pageSize: Number(pageSize) // 一頁顯示幾筆
         }
     }
     res.status(200).json(
@@ -234,6 +407,7 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
             data: resData,
         }),
     );
+
 
 });
 
@@ -376,6 +550,8 @@ export const createProductSpec: RequestHandler = handleErrorAsync(async (req, re
         const weight = productSpecList[i].weight;
         const price = productSpecList[i].price;
         const inStock = productSpecList[i].inStock;
+        const onlineStatus = productSpecList[i].onlineStatus;
+        const onlineDate = productSpecList[i].onlineStatus ? Date.now() : ''
 
         // 2.建立商品規格
         const resultProductSpec = await ProductSpecModel.create({
@@ -383,7 +559,9 @@ export const createProductSpec: RequestHandler = handleErrorAsync(async (req, re
             productNumber,
             weight,
             price,
-            inStock
+            inStock,
+            onlineStatus,
+            onlineDate
         });
 
         await resultProductSpec.populate({

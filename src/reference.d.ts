@@ -51,6 +51,7 @@ declare global {
     namespace Express {
         interface Request {
             user?: IUser | undefined;
+            file?: Express.Multer.File
         }
     }
 }

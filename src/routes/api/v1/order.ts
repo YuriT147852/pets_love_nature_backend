@@ -48,8 +48,9 @@ router.get(
                     "productId": "661a9a9fa892ea2a833a1009",
                     "price": 500,
                     "quantity": 123,
-                    "productTitle": "111",
-                    "coverImg": "aaa"
+                    "productTitle": "這是名稱",
+                    "coverImg": "https://imageUrl.com",
+                    "weight": 76
                     }
                 ],
                 "orderStatus": -3,
@@ -161,4 +162,27 @@ router.post(
 
 router.post('/payment_notify', OrderController.PaymentNotify);
 
+router.patch(
+    /**
+    * #swagger.description  = "修改某一筆訂單"
+    * #swagger.security=[{"Bearer": []}]
+    * #swagger.parameters['body'] = {
+        in: "body",
+        required: true,
+        schema:{
+            "orderId": "663f2c28c52d18d64cdb4570",
+            "orderStatus": 1
+        }
+    };
+    * #swagger.responses[200] = {
+            schema: {
+                "status": true,
+                "message" : "更新成功",
+            }
+        }
+     */
+    '/orderStatus',
+    isAuth,
+    OrderController.editOrderStatus
+);
 export default router;

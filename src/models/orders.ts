@@ -14,9 +14,11 @@ export interface OrderProduct {
     quantity: number;
     productTitle: string;
     coverImg: string;
+    weight: number;
+    productInfoId: Schema.Types.ObjectId
 }
 
-interface Order extends Document {
+export interface Order extends Document {
     userId: Customer | Schema.Types.ObjectId;
     orderProductList: OrderProduct[];
     orderDate: Date;
@@ -31,6 +33,7 @@ interface Order extends Document {
     doneDate?: Date;
     deliveryEmail: string;
     deliveryPhone: string;
+    createdAt?: Date;
 }
 
 const deliveryaddressSchema = new Schema<DeliveryAddress>(
@@ -49,7 +52,9 @@ const orderProductSchema = new Schema<OrderProduct>(
         price: { type: Number, required: [true, '購買商品清單price未填寫'] },
         quantity: { type: Number, required: [true, '購買商品清單quantity未填寫'] },
         productTitle: { type: String, required: [true, '購買商品清單productTitle未填寫'] },
-        coverImg: { type: String, required: [true, '購買商品清單coverImg未填寫'] }
+        coverImg: { type: String, required: [true, '購買商品清單coverImg未填寫'] },
+        weight: { type: Number, required: [true, '購買商品清單weight未填寫'] },
+        productInfoId: { type: Schema.Types.ObjectId }
     },
     { _id: false }
 );
@@ -60,7 +65,7 @@ const orderSchema = new Schema<Order>(
         orderProductList: { type: [orderProductSchema], required: [true, '購買商品清單未填寫'] },
         orderDate: { type: Date, default: Date.now },
         orderStatus: { type: Number, required: [true, '訂單狀態未填寫'], enum: [1, 2, 3, 4, 5, -1, -2, -3] },
-        orderAmount: { type: Number },
+        orderAmount: { type: Number, required: [true, '未填寫orderAmount'] },
         paymentMethod: { type: Number, enum: [1, 2] },
         deliveryUserName: { type: String, required: [true, '配送使用者姓名未填寫'] },
         deliveryAddress: { type: deliveryaddressSchema, required: [true, '配送地址未填寫'] },

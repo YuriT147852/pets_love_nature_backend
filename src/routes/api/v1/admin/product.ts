@@ -4,7 +4,7 @@ import { Back_isAuth } from '@/utils/isAuth';
 
 const router = Router();
 
-// 取得商品列表
+// 取得全部商品列表
 router.get(
     /**
      * #swagger.description  = "取得所有商品列表"
@@ -17,7 +17,7 @@ router.get(
             }
         }
      */
-    '',
+    '/all',
     ProductController.getProductList
 );
 
@@ -43,9 +43,10 @@ router.get(
     ProductController.getProductById
 );
 
+// 取得篩選條件商品列表
 router.get(
     /**
-     * #swagger.description  = "取得篩選條件商品列表"          
+     * #swagger.description  = "取得篩選條件商品列表"         
      * #swagger.parameters['onlineStatus'] = {
             required: false,
             description: '上線狀態',
@@ -55,7 +56,7 @@ router.get(
      * #swagger.parameters['searchText'] = { description: '關鍵字' }
      * #swagger.parameters['filterCategory'] = { description: '分類；fresh、cat、dog、dry' }
      * #swagger.parameters['sortOrder'] = { description: '選擇排序方式，預設-1；-1 由大到小 / 1 由小到大' }
-     * #swagger.parameters['sortBy'] = { description: '以指定項目排序，預設評價；項目：評價：star，價格：price，更新時間：updatedAt' }
+     * #swagger.parameters['sortBy'] = { description: '以指定項目排序，預設商品資訊ID；項目：評價：star，價格：price，更新時間：updatedAt；銷售量：salesVolume' }
      * #swagger.parameters['page'] = { description: '前往指定頁數，預設1' }
      * #swagger.parameters['limit'] = { description: '顯示筆數，預設10' }
      * #swagger.responses[200] = {
@@ -71,8 +72,8 @@ router.get(
             }
         }
      */
-    '/getFilterProductList',
-    ProductController.getFilterProductList
+    '',
+    ProductController.getAdminProductList
 );
 
 // 新增商品
@@ -80,7 +81,6 @@ router.post(
     /**
      * #swagger.description  = "新增商品"
      * #swagger.security=[{"Bearer": []}]
-     * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
           * #swagger.parameters['body'] = {
             in: 'body',
             required: true,
@@ -94,11 +94,13 @@ router.post(
                         "weight": 50,
                         "price": 60,
                         "inStock": 50,
+                        "onlineStatus": false
                     },
                     {
                         "weight": 200,
                         "price": 180,
                         "inStock": 50,
+                        "onlineStatus": false
                     }
                 ],
                 "imageGallery": 
@@ -136,11 +138,13 @@ router.post(
                         "weight": 50,
                         "price": 60,
                         "inStock": 50,
+                        "onlineStatus": false
                     },
                     {
                         "weight": 200,
                         "price": 180,
                         "inStock": 50,
+                        "onlineStatus": false
                     }
                 ]
             }           
@@ -156,11 +160,10 @@ router.post(
     ProductController.createProductSpec
 );
 
-
 // 修改商品
 router.patch(
     /**
-     * #swagger.description  = "修改商品"
+     * #swagger.description  = "修改商品資訊或商品規格"
      * #swagger.security=[{"Bearer": []}]
      * #swagger.parameters['body'] = {
             in: 'body',
@@ -219,6 +222,7 @@ router.delete(
     /**
      * #swagger.description= "刪除商品規格" 
      * #swagger.security=[{"Bearer": []}]
+     * #swagger.parameters['id'] = { description: '商品規格ID' }
      * #swagger.responses[200] = {
             schema: {
                 "status": "true",

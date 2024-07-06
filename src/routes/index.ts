@@ -86,7 +86,7 @@ routes.use(
 
 routes.use(
     /**
-     * #swagger.tags = ["Admin / Product - 管理者 / 會員 "]
+     * #swagger.tags = ["Admin / Customer - 管理者 / 會員 "]
      */
     '/api/v1/admin',
     admin

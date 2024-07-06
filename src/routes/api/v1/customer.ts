@@ -56,7 +56,8 @@ router.get(
             }
         }
      */
-    '/:id', isAuth,
+    '/:id',
+    isAuth,
     CustomerController.getInfo
 );
 
@@ -94,8 +95,34 @@ router.put(
             }
         }
      */
-    '/:id', isAuth,
+    '/:id',
+    isAuth,
     CustomerController.updateInfo
+);
+
+//修改會員狀態
+router.patch(
+    /**
+    * #swagger.description  = "修改多筆使用者的狀態"
+    * #swagger.security=[{"Bearer": []}]
+    * #swagger.parameters['body'] = {
+        in: "body",
+        required: true,
+        schema:{
+            "ids":["663f12237a6dabc6203875f4","66436361c2ae643fc43bf18a"],
+            "AccountStatus": 1
+        }
+    };
+    * #swagger.responses[200] = {
+            schema: {
+                "status": "success",
+                "message": "修改帳號狀態成功"
+            }
+        }
+     */
+    '/CustomerStatus',
+    isAuth,
+    CustomerController.updateAccountStatus
 );
 
 export default router;

@@ -57,9 +57,9 @@ export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, re
     if (process.env.NODE_ENV === 'development') {
       res.status(status).send({
         status: 'false',
-        message: message,
-        stack: err.stack
+        message: message
       });
+      console.log(err.stack);
       return;
     }
 
@@ -68,6 +68,7 @@ export const catchCustomError: ErrorRequestHandler = (err: CustomError, _req, re
         status: 'false',
         message: message
       });
+      return;
     }
   }
 };

@@ -9,7 +9,9 @@ router.get(
     /**
      * #swagger.description  = "取得訂單清單"
      * #swagger.parameters['page'] = { description: '頁數', required: true,}
-     * #swagger.parameters['filterStatus'] = { description: '物流排序 1:小到大 / 0:大到小' }
+     * #swagger.parameters['limit'] = { description: '一頁幾筆 預設10筆' }
+     * #swagger.parameters['sortOrder'] = { description: '大小排序種類 物流:orderStatus / 日期:createdAt' }
+     * #swagger.parameters['filterStatus'] = { description: '1:小到大 / 0:大到小 預設1' }
      * #swagger.parameters['searchText'] = { description: '搜尋關鍵字' }
      * #swagger.parameters['requestSame'] = { description: '完全一致  0:false/1:true' }
      * #swagger.parameters['searchType'] = { description: '文字搜尋種類 email,orderNum' }
@@ -23,12 +25,14 @@ router.get(
                         "_id": "6650489459f8875a5907eaf7",
                         "userId": "665044dc59f8875a5907eaf2",
                         "email": "zhengshi@example.com",
-                        "orderStatus": -1
+                        "orderStatus": -1,
+                        "createdAt": "2024-07-01T14:05:48.737Z"
                     },
                 ],
                 "page": {
                     "nowPage": "1",
-                    "totalPages": 2
+                    "totalPages": 2,
+                    "totalDocuments": 249
                 }
             },
             "message": "成功抓取訂單資訊"
