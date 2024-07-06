@@ -141,10 +141,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
     // 跳頁
     const skip = (Number(page) - 1) * pageSize;
-    // 獲取總筆數
-    const totalDocuments = await ProductSpecModel.countDocuments();
-    // 獲取總頁數
-    const totalPages = Math.ceil(totalDocuments / pageSize);
 
     // 排序
     const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
@@ -220,6 +216,9 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         aggregationPipeline.push({ $match: matchStage });
     }
 
+    // 不加入頁數先搜尋一次
+    const totalResult = await ProductSpecModel.aggregate(aggregationPipeline);
+
     // 加入排序及分頁
     aggregationPipeline.push(
         { $sort: sortField },
@@ -242,21 +241,24 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
     const formattedResult = [];
     for (let i = 0; i < result.length; i++) {
         const productSpecRes = result[i];
-        console.log("productSpecRes", productSpecRes);
-
         const data = JSON.parse(JSON.stringify(productSpecRes))
         data["productInfoId"] = productSpecRes.productId; // 商品資訊ID
         data["productSpecId"] = productSpecRes._id; // 商品規格ID
         formattedResult.push(data);
     }
 
+    // 獲取總筆數
+    const totalDocuments = totalResult.length;
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
     const resData = {
         content: formattedResult,
         page: {
-            // todo: 一直顯示所有商品數量
-            // totalAmount: totalDocuments,
+            totalAmount: totalDocuments, // 此次搜尋全部數量
             nowPage: Number(page),
-            totalPages
+            totalPages,
+            pageSize: Number(pageSize) // 一頁顯示幾筆
         }
     }
     res.status(200).json(
@@ -276,10 +278,6 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
     const pageSize = limit ? parseInt(limit as string, 10) : 10;
     // 跳頁
     const skip = (Number(page) - 1) * pageSize;
-    // 獲取總筆數
-    const totalDocuments = await ProductSpecModel.countDocuments();
-    // 獲取總頁數
-    const totalPages = Math.ceil(totalDocuments / pageSize);
 
     // 排序
     const sortOrderNumber: SortOrder = Number(sortOrder) === -1 ? -1 : 1;
@@ -353,6 +351,9 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         // matchStage['onlineStatus'] = { $eq: Boolean(onlineStatus) };
     }
 
+    // 不加入頁數先搜尋一次
+    const totalResult = await ProductSpecModel.aggregate(aggregationPipeline);
+
     // 如果 matchStage 不是空對象，則添加 $match 階段
     if (Object.keys(matchStage).length > 0) {
         aggregationPipeline.push({ $match: matchStage });
@@ -364,7 +365,7 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         { $skip: skip },                   // 跳過指定數量
         { $limit: pageSize }               // 限制輸出數量
     );
-    console.log("aggregationPipeline: ", aggregationPipeline);
+    // console.log("aggregationPipeline: ", aggregationPipeline);
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
     if (result.length === 0) {
@@ -386,13 +387,18 @@ export const getAdminProductList: RequestHandler = handleErrorAsync(async (req, 
         formattedResult.push(data);
     }
 
+    // 獲取總筆數
+    const totalDocuments = totalResult.length;
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
+
     const resData = {
         content: formattedResult,
         page: {
-            // todo: 一直顯示所有商品數量
-            // totalAmount: totalDocuments,
+            totalAmount: totalDocuments, // 此次搜尋全部數量
             nowPage: Number(page),
-            totalPages
+            totalPages,
+            pageSize: Number(pageSize) // 一頁顯示幾筆
         }
     }
     res.status(200).json(
