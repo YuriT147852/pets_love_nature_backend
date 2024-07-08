@@ -35,7 +35,14 @@ export const getAllCommentList: RequestHandler = handleErrorAsync(async (_req, r
 
 // 取得單一商品資訊的評價
 export const getFilterCommentList: RequestHandler = handleErrorAsync(async (req, res, next) => {
-  const result = await CommentModel.find({ productId: req.params.productId }).populate({
+  const productId = req.params.productId
+
+  const resProductInfo = await ProductModel.findOne({ _id: productId }).exec();
+  if (!resProductInfo) {
+    return next(errorResponse(404, '無此商品資訊ID: ' + productId));
+  }
+
+  const result = await CommentModel.find({ productId }).populate({
     path: 'productId',
     select: 'title subtitle star category otherInfo imageGallery'
   }).populate({
@@ -45,8 +52,12 @@ export const getFilterCommentList: RequestHandler = handleErrorAsync(async (req,
     path: 'orderId', select: '_id'
   });
   if (result.length === 0) {
-    next(errorResponse(404, '無評價資料'));
-    return;
+    res.status(200).json(
+      successResponse({
+        message: '無評價資料',
+        data: result,
+      }),
+    );
   }
   res.status(200).json(
     successResponse({

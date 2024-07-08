@@ -36,7 +36,7 @@ router.get(
      * #swagger.responses[404] = {
             schema: {
                 "status": "false",
-                "message": "此商品不存在",
+                "message": "無此商品資訊ID",
             }
         }
      */
