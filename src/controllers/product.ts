@@ -218,6 +218,10 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
     // 不加入頁數先搜尋一次
     const totalResult = await ProductSpecModel.aggregate(aggregationPipeline);
+    // 獲取總筆數
+    const totalDocuments = totalResult.length;
+    // 獲取總頁數
+    const totalPages = Math.ceil(totalDocuments / pageSize);
 
     // 加入排序及分頁
     aggregationPipeline.push(
@@ -229,10 +233,20 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
 
     const result = await ProductSpecModel.aggregate(aggregationPipeline);
     if (result.length === 0) {
+        const resData = {
+            content: [],
+            page: {
+                totalAmount: totalDocuments, // 此次搜尋全部數量
+                nowPage: Number(page),
+                totalPages,
+                pageSize: Number(pageSize) // 一頁顯示幾筆
+            }
+        }
+
         res.status(200).json(
             successResponse({
                 message: '無商品資料',
-                data: [],
+                data: resData,
             }),
         );
     }
@@ -246,11 +260,6 @@ export const getFilterProductList: RequestHandler = handleErrorAsync(async (req,
         data["productSpecId"] = productSpecRes._id; // 商品規格ID
         formattedResult.push(data);
     }
-
-    // 獲取總筆數
-    const totalDocuments = totalResult.length;
-    // 獲取總頁數
-    const totalPages = Math.ceil(totalDocuments / pageSize);
 
     const resData = {
         content: formattedResult,
